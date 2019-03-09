@@ -1,0 +1,57 @@
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+	margin: 0px;
+}
+
+.cell-1x1 {
+	width: 100vmin;
+	height: 100vmax;
+  padding: 5px;
+	display: table;
+}
+
+.cell-3x1 {
+	width: 300vmin;
+	height: 100vmax;
+}
+
+.cell-1x3 {
+	width: 100vmin;
+	height: 300vmax;
+}
+
+.cell-3x3 {
+	width: 300vmin;
+	height: 300vmax;
+}
+
+[class*="cell-"] {
+	display: inline-block;
+	padding: 5px;
+	border-style: solid;
+	border-width: 1px;
+	scroll-behavior: smooth; /* not supported in iOS though */
+	white-space: nowrap;
+}
+
+.sub-page-top-nav {
+	vertical-align: top;
+	text-align: center;
+}
+
+.color-1 {
+	background-color: #C9CF65;
+}
+
+.color-2 {
+	background-color: #C27DFF;
+}
+
+
+button {
+	width: 5vmax;
+	height: 5vmin;
+}
