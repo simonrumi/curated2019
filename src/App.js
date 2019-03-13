@@ -23,14 +23,14 @@ class App extends Component {
 
     // a range of directions, in radians, for each direction a cell can be found in
     this.DIRECTION_RANGES = {
-      'east': [15/8 * Math.PI, 1/8 * Math.PI],
+      'east': [-1/8 * Math.PI, 1/8 * Math.PI],
       'northeast': [1/8 * Math.PI, 3/8 * Math.PI],
       'north': [3/8 * Math.PI, 5/8 * Math.PI],
       'northwest': [5/8 * Math.PI, 7/8 * Math.PI],
-      'west': [7/8 * Math.PI, 9/8 * Math.PI],
-      'southwest': [9/8 * Math.PI, 11/8 * Math.PI],
-      'south': [11/8 * Math.PI, 13/8 * Math.PI],
-      'southeast': [13/8 * Math.PI, 15/8 * Math.PI],
+      'west': [-7/8 * Math.PI, 7/8 * Math.PI],
+      'southwest': [-7/8 * Math.PI, -5/8 * Math.PI],
+      'south': [-5/8 * Math.PI, -3/8 * Math.PI],
+      'southeast': [-3/8 * Math.PI, -1/8 * Math.PI],
     }
 
     this.DIRECTION_VECTORS = {
@@ -147,15 +147,17 @@ class App extends Component {
         let travelDirection = this.getTravelDirection(newTouchPosition);
         this.log('handleTouchMove - travelDirection=' + travelDirection);
         let newWindowPosition = this.getNewWindowPositionFromTravelDirection(travelDirection);
+        let correctedWindowPosition = this.keepWithinGridBoundaries(newWindowPosition);
         window.scroll({
-          top: newWindowPosition[1],
-          left: newWindowPosition[0],
+          top: correctedWindowPosition[1],
+          left: correctedWindowPosition[0],
           behavior: 'smooth'
         });
       } else {
         let moveVector = this.subtractVectors(newTouchPosition, this.touchStartPosition);
         let reverseMoveVector = this.scaleVector(moveVector, -1);
         let newScrollPosition = this.addVectors(this.windowPosition, reverseMoveVector);
+        //let correctedScrollPosition = this.keepWithinGridBoundaries(newScrollPosition);
         window.scroll({
           top: newScrollPosition[1],
           left: newScrollPosition[0]
@@ -181,7 +183,7 @@ class App extends Component {
     }
     let xDistanceTraveled = newTouchPosition[0] - this.touchStartPosition[0];
     let yDistanceTraveled = newTouchPosition[1] - this.touchStartPosition[1];
-    let angleOfTravel = Math.atan(yDistanceTraveled / xDistanceTraveled);
+    let angleOfTravel = Math.atan2(yDistanceTraveled, xDistanceTraveled);
     return this.getCompassPoint(angleOfTravel);
   }
 
@@ -193,10 +195,10 @@ class App extends Component {
     let directionNames = Object.keys(this.DIRECTION_RANGES);
     let directionIndex;
     for (let i in directionRanges) {
-      // special case for directionRanges[0] which is pointing northeast
-      if (i == 0) {
-        if ((angleOfTravel > directionRanges[i][0] && angleOfTravel <= Math.PI * 2) ||
-          (angleOfTravel >= 0 && angleOfTravel <= directionRanges[i][1])) {
+      // special case for  west
+      // it is the direction where the angle could be close to PI or close to -PI
+      if (directionNames[i] == "west") {
+        if ((angleOfTravel < directionRanges[i][0]) || (angleOfTravel > directionRanges[i][1])) {
             directionIndex = i;
             break;
           }
@@ -205,17 +207,37 @@ class App extends Component {
         break;
       }
     }
+    if (!directionIndex) {
+      throw new Error('in getCompassPoint(): did not find a directionIndex, angleOfTravel = ' + angleOfTravel);
+    }
     return directionNames[directionIndex];
   }
 
   getNewWindowPositionFromTravelDirection = (travelDirection) => {
     // direction vector is a unit vector. e.g. [1,-1] tells us to move 1 screen width right and 1 screen height down
     let directionVector = this.DIRECTION_VECTORS[travelDirection];
-    let newWindowPositionX = this.windowPosition[0] + this.getCellWidth() * directionVector[0];
-    let newWindowPositiony = this.windowPosition[1] + this.getCellHeight() * directionVector[1];
+    let reverseDirectionVector = this.scaleVector(directionVector, -1);
+    let newWindowPositionX = this.windowPosition[0] + this.getCellWidth() * reverseDirectionVector[0];
+    let newWindowPositionY = this.windowPosition[1] + this.getCellHeight() * reverseDirectionVector[1];
 
     //QQQQ need to correct for going past edges of grid
-    return([newWindowPositionX, newWindowPositiony]);
+    return([newWindowPositionX, newWindowPositionY]);
+  }
+
+  keepWithinGridBoundaries = (windowPosition) => {
+    let x = windowPosition[0];
+    let y = windowPosition[1];
+    if (windowPosition[0] > this.GRID_SIZE * this.getCellWidth()) {
+      x = this.GRID_SIZE * this.getCellWidth();
+    } else if (windowPosition[0] < 0) {
+      x = 0;
+    }
+    if (windowPosition[1] > this.GRID_SIZE * this.getCellHeight()) {
+      y = this.GRID_SIZE * this.getCellHeight();
+    } else if (windowPosition[1] < 0) {
+      y = 0;
+    }
+    return [x,y];
   }
 
   getCellWidth = () => {
