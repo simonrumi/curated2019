@@ -18,8 +18,7 @@ class App extends Component {
     this.BOTTOM = 2;
     this.LEFT = 0;
     this.RIGHT = 2;
-    this.HORIZ_THRESHOLD = 0.25;
-    this.VERT_THRESHOLD = 0.25;
+    this.THRESHOLD = 0.25;
 
     // a range of directions, in radians, for each direction a cell can be found in
     this.DIRECTION_RANGES = {
@@ -43,12 +42,6 @@ class App extends Component {
       'south': [0,-1],
       'southeast': [1,-1],
     }
-
-    // handle all touch events
-    //onTouchStart={(evt) => this.handleTouchStart(evt)}
-    //onTouchMove={(evt) => this.handleTouchMove(evt)}
-    //onTouchCancel={(evt) => this.handleTouchCancel(evt)}
-    //onTouchEnd={(evt) => this.handleTouchEnd(evt)}
 
     window.addEventListener("touchstart", (evt) => {
       //evt.preventDefault ();
@@ -139,10 +132,11 @@ class App extends Component {
   handleTouchMove = (evt) => {
       this.log('touch move');
       let newTouchPosition = [evt.touches[0].clientX, evt.touches[0].clientY]
+      let distanceMoved = this.getDistanceMoved(newTouchPosition);
       //this.log(' -> position = ' + newTouchPosition[0] + ',' + newTouchPosition[1]);
 
-      if (newTouchPosition[0] > ((1 + this.HORIZ_THRESHOLD) * this.getCellWidth())) {
-        this.log(' -> position exceeded HORIZ_THRESHOLD...now we want to scroll');
+      if (Math.abs(distanceMoved) > this.THRESHOLD * this.getCellWidth()) {    //(newTouchPosition[0] > ((1 + this.HORIZ_THRESHOLD) * this.getCellWidth())) {
+        this.log(' -> position exceeded THRESHOLD...now we want to scroll');
         evt.preventDefault();
         let travelDirection = this.getTravelDirection(newTouchPosition);
         this.log('handleTouchMove - travelDirection=' + travelDirection);
@@ -171,6 +165,11 @@ class App extends Component {
 
   handleTouchEnd = (evt) => {
       this.log('touch end');
+  }
+
+  getDistanceMoved = (newTouchPosition) => {
+    let differenceBetweenStartAndEndPositions = this.subtractVectors(newTouchPosition, this.touchStartPosition);
+    return this.getVectorLength(differenceBetweenStartAndEndPositions);
   }
 
   /*
@@ -219,8 +218,6 @@ class App extends Component {
     let reverseDirectionVector = this.scaleVector(directionVector, -1);
     let newWindowPositionX = this.windowPosition[0] + this.getCellWidth() * reverseDirectionVector[0];
     let newWindowPositionY = this.windowPosition[1] + this.getCellHeight() * reverseDirectionVector[1];
-
-    //QQQQ need to correct for going past edges of grid
     return([newWindowPositionX, newWindowPositionY]);
   }
 
@@ -277,6 +274,14 @@ class App extends Component {
       throw new Error('the vector must be an array of length 2 and the scalar must be a number');
     }
     return [vect1[0] * scalar, vect1[1] * scalar];
+  }
+
+  getVectorLength = (vector) => {
+    let sumOfSquares = 0;
+    for (let i=0; i<vector.length; i++) {
+      sumOfSquares += vector[i] * vector[i];
+    }
+    return Math.sqrt(sumOfSquares);
   }
 
   log = (message) => {
