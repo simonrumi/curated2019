@@ -93,7 +93,7 @@ class App extends Component {
     let button = <button type="button" onClick={() => this.handleNav(navData)} key={buttonKey}>home</button>;
     let subPageTopNav = <div className="sub-page-top-nav" key={subPageTopNavKey}>{button}</div>;
     let cell = <div
-      className="cell-1x1 color-2"
+      className={'cell-1x1 color-' + cellPosition + '-' + rowPosition}
       key={cellKey}
       >{subPageTopNav}</div>;
     return cell;
@@ -151,7 +151,7 @@ class App extends Component {
         let moveVector = this.subtractVectors(newTouchPosition, this.touchStartPosition);
         let reverseMoveVector = this.scaleVector(moveVector, -1);
         let newScrollPosition = this.addVectors(this.windowPosition, reverseMoveVector);
-        //let correctedScrollPosition = this.keepWithinGridBoundaries(newScrollPosition);
+//let correctedScrollPosition = this.keepWithinGridBoundaries(newScrollPosition);
         window.scroll({
           top: newScrollPosition[1],
           left: newScrollPosition[0]
