@@ -176,7 +176,6 @@ class App extends Component {
   * as the width and length, for use by handleTouchMove
   */
   handleOrientationChange = (evt) => {
-    alert('the orientation of the device is now ' + window.screen.orientation.angle);
     this.cellHeight = window.screen.height;
     this.cellWidth = window.screen.width;
   }

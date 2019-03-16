@@ -6,6 +6,13 @@ html, body {
 	margin: 0px;
 }
 
+#root {
+  width: 300vw;
+  height: 300vh;
+  background-image: url("img/curatedBg-min.png");
+  background-size: 300vw 300vh;
+}
+
 .cell-1x1 {
 	width: 100vw;
 	height: 100vh;
@@ -43,11 +50,11 @@ html, body {
 }
 
 .color-0-0, .color-0-2, .color-1-1, .color-2-0, .color-2-2 {
-	background-color: #C9CF65;
+	/*background-color: #C9CF65;*/
 }
 
 .color-0-1, .color-1-0, .color-1-2, .color-2-1 {
-	background-color: #C27DFF;
+	/*background-color: #C27DFF;*/
 }
 
 button {
