@@ -7,25 +7,25 @@ html, body {
 }
 
 .cell-1x1 {
-	width: 100vmin;
-	height: 100vmax;
+	width: 100vw;
+	height: 100vh;
   padding: 5px;
   display: table;
 }
 
 .cell-3x1 {
-	width: 300vmin;
-	height: 100vmax;
+	width: 300vw;
+	height: 100vh;
 }
 
 .cell-1x3 {
-	width: 100vmin;
-	height: 300vmax;
+	width: 100vw;
+	height: 300vh;
 }
 
 .cell-3x3 {
-	width: 300vmin;
-	height: 300vmax;
+	width: 300vw;
+	height: 300vh;
 }
 
 [class*="cell-"] {

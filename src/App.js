@@ -56,11 +56,16 @@ class App extends Component {
     //window.addEventListener("touchcanel", (evt) => {
       //evt.preventDefault ();
       //this.handleTouchCancel(evt);
-  //  }, {passive: false});
+    //  }, {passive: false});
     //window.addEventListener("touchend", (evt) => {
       //s   evt.preventDefault ();
       //this.handleTouchEnd(evt);
     //}, {passive: false});
+
+    window.addEventListener("orientationchange", (evt) => {
+      this.handleOrientationChange(evt);
+    }, {passive: false}); // setting passive to false means we want to interrupt the scrolling while we run this callback. This is the default anyway
+
   }
 
   render() {
@@ -151,7 +156,6 @@ class App extends Component {
         let moveVector = this.subtractVectors(newTouchPosition, this.touchStartPosition);
         let reverseMoveVector = this.scaleVector(moveVector, -1);
         let newScrollPosition = this.addVectors(this.windowPosition, reverseMoveVector);
-//let correctedScrollPosition = this.keepWithinGridBoundaries(newScrollPosition);
         window.scroll({
           top: newScrollPosition[1],
           left: newScrollPosition[0]
@@ -165,6 +169,16 @@ class App extends Component {
 
   handleTouchEnd = (evt) => {
       this.log('touch end');
+  }
+
+  /*
+  * handleDeviceRotate - when the deive is rotated, we need to update what the app considers
+  * as the width and length, for use by handleTouchMove
+  */
+  handleOrientationChange = (evt) => {
+    alert('the orientation of the device is now ' + window.screen.orientation.angle);
+    this.cellHeight = window.screen.height;
+    this.cellWidth = window.screen.width;
   }
 
   getDistanceMoved = (newTouchPosition) => {
