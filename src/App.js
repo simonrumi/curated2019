@@ -4,6 +4,10 @@ import React, { Component } from 'react';
 class App extends Component {
   /***************
   QQQQQQQ need to set the state somehow - react updates every time the state is change, so make use of that QQQQQQQQQ
+  then need to use state change to update size of cells
+  these need to be changed when the orientation changes
+  also need to take the url window into account and make the cell smaller than 100vh
+  after all that, then need to work out how to display content within the cells, maybe using layers
   **************/
   constructor(props) {
     super(props);
@@ -299,6 +303,7 @@ class App extends Component {
       let initialHeight = document.getElementsByClassName('cell-1x1')[0].clientHeight;
       if (window.innerHeight < initialHeight) {
         this.cellHeight = window.innerHeight;
+        let cells1x1 = document.getElementsByClassName('cell-1x1').style.height = this.cellHeight;
       } else {
         this.cellHeight = initialHeight;
       }
