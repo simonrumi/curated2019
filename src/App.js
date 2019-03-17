@@ -42,7 +42,9 @@ class App extends Component {
       'south': [0,-1],
       'southeast': [1,-1],
     }
+  }
 
+  componentDidMount() {
     window.addEventListener("touchstart", (evt) => {
       //evt.preventDefault ();
       this.handleTouchStart(evt);
@@ -66,6 +68,11 @@ class App extends Component {
       this.handleOrientationChange(evt);
     }, {passive: false}); // setting passive to false means we want to interrupt the scrolling while we run this callback. This is the default anyway
 
+    window.addEventListener("load", (evt) => {
+      this.handleOrientationChange(evt);
+      let navData = {gotoRow: this.MIDDLE, gotoCell: this.MIDDLE};
+      this.handleNav(navData);
+    }, {passive: false});
   }
 
   render() {
@@ -178,6 +185,14 @@ class App extends Component {
   handleOrientationChange = (evt) => {
     this.cellHeight = window.screen.height;
     this.cellWidth = window.screen.width;
+    let rootDiv = document.getElementById('root');;
+    if (this.cellWidth < this.cellHeight) {
+      rootDiv.classList.add('full-grid-portrait');
+      rootDiv.classList.remove('full-grid-landscape');
+    } else {
+      rootDiv.classList.add('full-grid-landscape');
+      rootDiv.classList.remove('full-grid-portrait');
+    }
   }
 
   getDistanceMoved = (newTouchPosition) => {
@@ -252,17 +267,17 @@ class App extends Component {
 
   getCellWidth = () => {
     if (this.cellWidth === null) {
-      this.cellWidth = document.getElementsByClassName('cell-1x1')[0].offsetWidth;
+      this.cellWidth = document.getElementsByClassName('cell-1x1')[0].clientWidth;
     }
     return this.cellWidth;
   }
 
   getCellHeight = () => {
     if (this.cellHeight === null) {
-      this.cellHeight = document.getElementsByClassName('cell-1x1')[0].offsetHeight;
+      this.cellHeight = document.getElementsByClassName('cell-1x1')[0].clientHeight;
       // all possibilities:
       // document.getElementsByClassName('cell-1x1')[0].clientHeight;
-      // document.getElementsByClassName('cell-1x1')[0].offsetHeight;
+      // document.getElementsByClassName('cell-1x1')[0].offsetHeight; // this seems to be bigger; the whole viewable window including scroll bars
       // document.getElementsByClassName('cell-1x1')[0].scrollHeight;
     }
     return this.cellHeight;

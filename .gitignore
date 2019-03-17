@@ -24,3 +24,6 @@ yarn-error.log*
 
 # img files
 /src/img/curatedBg.png
+/src/img/curated-logo.png
+/src/img/landscape.png
+/src/img/portrait.png

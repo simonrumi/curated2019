@@ -9,8 +9,16 @@ html, body {
 #root {
   width: 300vw;
   height: 300vh;
+}
+
+.full-grid-portrait {
+  background-size: 300vmin;
   background-image: url("img/curatedBg-min.png");
-  background-size: 300vw 300vh;
+}
+
+.full-grid-landscape {
+  background-size: 300vmax;
+  background-image: url("img/curatedBg-landscape-min.png");
 }
 
 .cell-1x1 {
@@ -38,8 +46,9 @@ html, body {
 [class*="cell-"] {
 	display: inline-block;
   /*padding: 5px;*/
-	border-style: solid;
+	border-style: dashed solid;
 	border-width: 1px;
+  border-color: #ffc5ca;
 	scroll-behavior: smooth; /* not supported in iOS though */
 	white-space: nowrap;
 }
