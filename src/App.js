@@ -45,6 +45,8 @@ class App extends Component {
   }
 
   componentDidMount() {
+    this.getUsableScreenSize();
+
     window.addEventListener("touchstart", (evt) => {
       //evt.preventDefault ();
       this.handleTouchStart(evt);
@@ -77,6 +79,19 @@ class App extends Component {
 
   render() {
     return this.makeGrid();
+  }
+
+  getUsableScreenSize = () => {
+    let realWidth = window.innerWidth;
+    let realHeight = window.innerHeight;
+    alert('innerWidth=' + realWidth + ', innerHeight=' + realHeight + ', getCellWidth=' + this.getCellWidth() + ', getCellHeight=' + this.getCellHeight())
+    //see https://css-tricks.com/the-trick-to-viewport-units-on-mobile/
+    // First we get the viewport width & height and we multiple them by 1% to get a value for the vw & vh units
+    //let vw = window.innerWidth * 0.01;
+    //let vh = window.innerHeight * 0.01;
+    // Then we set the value in the custom property to the root of the document
+    //document.documentElement.style.setProperty('--vw', `${vw}px`);
+    //document.documentElement.style.setProperty('--vh', `${vh}px`);
   }
 
   makeGrid = () => {
@@ -185,7 +200,10 @@ class App extends Component {
   handleOrientationChange = (evt) => {
     this.cellHeight = window.screen.height;
     this.cellWidth = window.screen.width;
-    let rootDiv = document.getElementById('root');;
+
+    this.getUsableScreenSize();
+
+    let rootDiv = document.getElementById('root');
     if (this.cellWidth < this.cellHeight) {
       rootDiv.classList.add('full-grid-portrait');
       rootDiv.classList.remove('full-grid-landscape');
