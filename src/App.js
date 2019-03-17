@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 //import './App.css';
 
 class App extends Component {
+  /***************
+  QQQQQQQ need to set the state somehow - react updates every time the state is change, so make use of that QQQQQQQQQ
+  **************/
   constructor(props) {
     super(props);
     this.loggingOn = true;
@@ -11,7 +14,7 @@ class App extends Component {
     this.windowPosition =[];
     this.touchStartPosition = [];
 
-    // some constants, for easy reading
+    /*** some constants, for easy reading ***/
     this.GRID_SIZE = 3;
     this.TOP = 0;
     this.MIDDLE = 1;
@@ -82,9 +85,10 @@ class App extends Component {
   }
 
   getUsableScreenSize = () => {
+    let chromeHeight = window.outerHeight - window.innerHeight;
     let realWidth = window.innerWidth;
     let realHeight = window.innerHeight;
-    alert('innerWidth=' + realWidth + ', innerHeight=' + realHeight + ', getCellWidth=' + this.getCellWidth() + ', getCellHeight=' + this.getCellHeight())
+    alert('innerWidth=' + realWidth + ', innerHeight=' + realHeight + ', getCellWidth=' + this.getCellWidth() + ', getCellHeight=' + this.getCellHeight() + ', chromeHeight=' + chromeHeight);
     //see https://css-tricks.com/the-trick-to-viewport-units-on-mobile/
     // First we get the viewport width & height and we multiple them by 1% to get a value for the vw & vh units
     //let vw = window.innerWidth * 0.01;
