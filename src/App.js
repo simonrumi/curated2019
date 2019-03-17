@@ -295,13 +295,18 @@ class App extends Component {
   }
 
   getCellHeight = () => {
-    if (this.cellHeight === null) {
-      this.cellHeight = document.getElementsByClassName('cell-1x1')[0].clientHeight;
+    //if (this.cellHeight === null) {
+      let initialHeight = document.getElementsByClassName('cell-1x1')[0].clientHeight;
+      if (window.innerHeight < initialHeight) {
+        this.cellHeight = window.innerHeight;
+      } else {
+        this.cellHeight = initialHeight;
+      }
       // all possibilities:
       // document.getElementsByClassName('cell-1x1')[0].clientHeight;
       // document.getElementsByClassName('cell-1x1')[0].offsetHeight; // this seems to be bigger; the whole viewable window including scroll bars
       // document.getElementsByClassName('cell-1x1')[0].scrollHeight;
-    }
+    //}
     return this.cellHeight;
   }
 
