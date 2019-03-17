@@ -85,7 +85,7 @@ class App extends Component {
   }
 
   getUsableScreenSize = () => {
-    let chromeHeight = window.outerHeight - window.innerHeight;
+    let chromeHeight = this.getCellHeight() - window.innerHeight;
     let realWidth = window.innerWidth;
     let realHeight = window.innerHeight;
     alert('innerWidth=' + realWidth + ', innerHeight=' + realHeight + ', getCellWidth=' + this.getCellWidth() + ', getCellHeight=' + this.getCellHeight() + ', chromeHeight=' + chromeHeight);
