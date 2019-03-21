@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
 
-
-
 class App extends Component {
   /***************
   QQQQQQQ need to set the state somehow - react updates every time the state is change, so make use of that QQQQQQQQQ
@@ -35,7 +33,7 @@ class App extends Component {
 
   /* *****
   * keeping these here for reference in case we need to go back to doing these in react
-  
+
   makeGrid = () => {
     let grid = [];
     for (let i = 0; i < GRID_SIZE; i++) {
