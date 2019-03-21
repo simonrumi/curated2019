@@ -250,7 +250,7 @@ const getCellHeight = () => {
     let initialHeight = document.getElementsByClassName('cell-1x1')[0].clientHeight;
     if (window.innerHeight < initialHeight) {
       gridState.cellHeight = window.innerHeight;
-      let cells1x1 = document.getElementsByClassName('cell-1x1').style.height = gridState.cellHeight;
+      document.getElementsByClassName('cell-1x1').style.height = gridState.cellHeight;
     } else {
       gridState.cellHeight = initialHeight;
     }
