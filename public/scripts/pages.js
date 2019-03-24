@@ -39,6 +39,11 @@ const pageBuilder = () => {
       rightNav.innerHTML = '<img src="/img/arrowE.png"/>';
       pageMiddle.appendChild(rightNav);
 
+      let bottomNav = document.createElement('div');
+      bottomNav.classList.add('nav');
+      bottomNav.innerHTML = '<img src="/img/arrowSW.png" class="align-left"/><img src="/img/arrowS.png"/><img src="/img/arrowSE.png" class="align-right"/>';
+      pageContainer.appendChild(bottomNav);
+
     }
   }
 }

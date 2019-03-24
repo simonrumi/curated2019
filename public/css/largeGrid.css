@@ -39,9 +39,9 @@ width: calc(var(--vw, 1vw) * 300); */ /* see https://css-tricks.com/the-trick-to
 
 [class*="cell-"] {
 	display: inline-block;
-	border-style: dashed solid;
+	/*border-style: dashed solid;
 	border-width: 1px;
-  border-color: #ffc5ca;
+  border-color: #ffc5ca;*/
 	scroll-behavior: smooth; /* not supported in iOS though */
 	white-space: nowrap;
 }
