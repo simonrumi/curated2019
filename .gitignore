@@ -23,7 +23,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # img files
-/src/img/curatedBg.png
-/src/img/curated-logo.png
-/src/img/landscape.png
-/src/img/portrait.png
+/public/img/curatedBg.png
+/public/img/curated-logo.png
+/public/img/landscape.png
+/public/img/portrait.png

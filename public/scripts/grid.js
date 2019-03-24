@@ -1,8 +1,6 @@
+"use strict";
+
 document.addEventListener("DOMContentLoaded", (evt) => {
-  makeGrid();
-
-  //getUsableScreenSize();
-
   window.addEventListener("touchstart", (evt) => {
     //evt.preventDefault ();
     handleTouchStart(evt);
@@ -60,22 +58,21 @@ const makeGrid = () => {
 
 const makeOneRow = (rowPosition) => {
   let row = '', children = '';
-  let rowId = getNextId();
+  //let rowId = getNextId();
   for (let i = 0; i < GRID_SIZE; i++) {
     children += makeOneCell(i, rowPosition);
   }
-  row = '<div class="cell-3x1" id="' + rowId + '">' + children + '</div>';
+  row = '<div class="cell-3x1" id="row' + rowPosition + '">' + children + '</div>';
   return row;
 }
 
 const makeOneCell = (cellPosition, rowPosition) => {
-  let buttonId = getNextId();
-  let subPageTopNavId = getNextId();
-  let cellId = getNextId();
-  let navData = {gotoRow: MIDDLE, gotoCell: MIDDLE};
-  let button = '<button type="button" onClick=handleNav(navData) id="' + buttonId + '">home</button>';
-  let subPageTopNav = '<div className="sub-page-top-nav" id="' + subPageTopNavId + '">' + button + '</div>';
-  let cell = '<div class="cell-1x1 color-' + cellPosition + '-' + rowPosition + ' id="' + cellId + '">' + subPageTopNav + '</div>';
+  //let buttonId = getNextId();
+  //let subPageTopNavId = getNextId();
+  //let navData = {gotoRow: MIDDLE, gotoCell: MIDDLE};
+  //let button = '<button type="button" onClick=handleNav(navData) id="' + buttonId + '">home</button>';
+  //let subPageTopNav = '<div className="sub-page-top-nav" id="' + subPageTopNavId + '">' + button + '</div>';
+  let cell = '<div class="cell-1x1" id="cell' + cellPosition + '-row' + rowPosition + '"></div>'; //' + subPageTopNav + '
   return cell;
 }
 
@@ -100,7 +97,7 @@ const handleNav = (navData) => {
 const handleTouchStart = (evt) => {
   // just want to capture scroll position and the touch position
     let touch0 = evt.touches[0];
-    log('touchStartPosition=(' + touch0.clientX + ',' + touch0.clientY + ') windowPosition=(' + window.pageXOffset + ',' + window.pageYOffset + ')');
+    //log('touchStartPosition=(' + touch0.clientX + ',' + touch0.clientY + ') windowPosition=(' + window.pageXOffset + ',' + window.pageYOffset + ')');
     gridState.touchStartPosition = [touch0.clientX, touch0.clientY];
     gridState.windowPosition = [window.pageXOffset, window.pageYOffset];
 }
@@ -110,16 +107,15 @@ const handleTouchStart = (evt) => {
 * it reaches a THRESHOLD, then the window srolls all the way to the next grid section
 */
 const handleTouchMove = (evt) => {
-    log('touch move');
+    //log('touch move');
     let newTouchPosition = [evt.touches[0].clientX, evt.touches[0].clientY]
     let distanceMoved = getDistanceMoved(newTouchPosition);
-    //log(' -> position = ' + newTouchPosition[0] + ',' + newTouchPosition[1]);
 
     if (Math.abs(distanceMoved) > THRESHOLD * getCellWidth()) {
-      log(' -> position exceeded THRESHOLD...now we want to scroll');
+      //log(' -> position exceeded THRESHOLD...now we want to scroll');
       evt.preventDefault();
       let travelDirection = getTravelDirection(newTouchPosition);
-      log('handleTouchMove - travelDirection=' + travelDirection);
+      //log('handleTouchMove - travelDirection=' + travelDirection);
       let newWindowPosition = getNewWindowPositionFromTravelDirection(travelDirection);
       let correctedWindowPosition = keepWithinGridBoundaries(newWindowPosition);
       window.scroll({
@@ -152,7 +148,6 @@ const handleTouchEnd = (evt) => {
 */
 const handleOrientationChange = (evt) => {
   toggleRootDivOrientation();
-  //getUsableScreenSize();
   gridState.cellWidth = window.screen.width;
   gridState.cellHeight = window.screen.height;
 }
