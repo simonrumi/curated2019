@@ -13,10 +13,10 @@ p {
 }
 
 .nav {
-  position: relative;
+  /*position: relative;*/
   max-height: 4vh;
-  top: 0;
-  left: 0;
+  /*top: 0;
+  left: 0;*/
 }
 
 .nav img {

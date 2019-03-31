@@ -26,8 +26,8 @@ width: calc(var(--vw, 1vw) * 300); */ /* see https://css-tricks.com/the-trick-to
 .cell-1x1 {
 	width: 100vw;
 	height: 100vh;
-  padding: 1vh 1vw;
-  display: table;
+  /*padding: 1vh 1vw;*/
+  /*display: table;*/
   vertical-align: middle;
   text-align: center;
 }
