@@ -32,7 +32,7 @@ const pageBuilder = () => {
         pageContainer.appendChild(bottomNav);
 
         let sideNavHeight = this.getSideNavHeight(topNav, bottomNav);
-        leftNav.style.heeight = sideNavHeight + 'px';
+        leftNav.style.height = sideNavHeight + 'px';
         rightNav.style.height = sideNavHeight + 'px';
 
         return pageContent;
@@ -40,7 +40,7 @@ const pageBuilder = () => {
 
       getSideNavHeight: function(topNav, bottomNav) {
         // window inner height minus the top and bottom nav heights
-        window.innerHeight - topNav.clientHeight - bottomNav.clientHeight;
+        return window.innerHeight - topNav.clientHeight - bottomNav.clientHeight;
       },
 
       homePage: function(pageContentDiv) {
