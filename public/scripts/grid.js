@@ -186,31 +186,22 @@ const getTravelDirection = (newTouchPosition) => {
 * given an angle, return the closest compass direction (east, northeast, etc)
 */
 const getCompassPoint = (angleOfTravel) => {
-  let directionRanges = Object.values(DIRECTION_RANGES);
-  let directionNames = Object.keys(DIRECTION_RANGES);
-  let directionIndex;
-  for (let i in directionRanges) {
-    // special case for  west
-    // it is the direction where the angle could be close to PI or close to -PI
-    if (directionNames[i] == "west") {
-      if ((angleOfTravel < directionRanges[i][0]) || (angleOfTravel > directionRanges[i][1])) {
-          directionIndex = i;
-          break;
+  let closestDirection = Object.keys(directions).reduce((result, direction) => {
+    if (direction == 'west') {
+      if ((angleOfTravel < directions[direction].range[0]) || (angleOfTravel > directions[direction].range[1])) {
+          result = direction;
         }
-    } else if (angleOfTravel > directionRanges[i][0] && angleOfTravel <= directionRanges[i][1]) {
-      directionIndex = i;
-      break;
+    } else if (angleOfTravel > directions[direction].range[0] && angleOfTravel <= directions[direction].range[1]) {
+      result = direction;
     }
-  }
-  if (!directionIndex) {
-    throw new Error('in getCompassPoint(): did not find a directionIndex, angleOfTravel = ' + angleOfTravel);
-  }
-  return directionNames[directionIndex];
+    return result;
+  }, null);
+  return closestDirection;
 }
 
 const getNewWindowPositionFromTravelDirection = (travelDirection) => {
   // direction vector is a unit vector. e.g. [1,-1] tells us to move 1 screen width right and 1 screen height down
-  let directionVector = DIRECTION_VECTORS[travelDirection];
+  let directionVector = directions[travelDirection]['vector'];
   let reverseDirectionVector = scaleVector(directionVector, -1);
   let newWindowPositionX = gridState.windowPosition[0] + getCellWidth() * reverseDirectionVector[0];
   let newWindowPositionY = gridState.windowPosition[1] + getCellHeight() * reverseDirectionVector[1];
@@ -309,26 +300,3 @@ const MIDDLE = 1;
 //const LEFT = 0;
 //const RIGHT = 2;
 const THRESHOLD = 0.25;
-
-// a range of angles, in radians, for each direction a cell can be found in
-const DIRECTION_RANGES = {
-  'east': [-1/8 * Math.PI, 1/8 * Math.PI],
-  'northeast': [1/8 * Math.PI, 3/8 * Math.PI],
-  'north': [3/8 * Math.PI, 5/8 * Math.PI],
-  'northwest': [5/8 * Math.PI, 7/8 * Math.PI],
-  'west': [-7/8 * Math.PI, 7/8 * Math.PI],
-  'southwest': [-7/8 * Math.PI, -5/8 * Math.PI],
-  'south': [-5/8 * Math.PI, -3/8 * Math.PI],
-  'southeast': [-3/8 * Math.PI, -1/8 * Math.PI],
-};
-
-const DIRECTION_VECTORS = {
-  'east': [1,0],
-  'northeast': [1,1],
-  'north': [0,1],
-  'northwest': [-1, 1],
-  'west': [-1,0],
-  'southwest': [-1,-1],
-  'south': [0,-1],
-  'southeast': [1,-1],
-};
