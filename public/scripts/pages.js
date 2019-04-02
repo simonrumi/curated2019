@@ -31,16 +31,25 @@ const pageBuilder = () => {
         bottomNav.innerHTML =  directions.southwest.html + directions.south.html + directions.southeast.html;
         pageContainer.appendChild(bottomNav);
 
-        let sideNavHeight = this.getSideNavHeight(topNav, bottomNav);
-        leftNav.style.height = sideNavHeight + 'px';
-        rightNav.style.height = sideNavHeight + 'px';
-
         return pageContent;
       },
 
-      getSideNavHeight: function(topNav, bottomNav) {
-        // window inner height minus the top and bottom nav heights
-        return window.innerHeight - topNav.clientHeight - bottomNav.clientHeight;
+      correctSideNavHeights: function() {
+        // nav divs have max-height: 4vh
+        // since the nav imagees are large, this will push the size to the max height
+        // so the height of the nav divs will be window.outerHeight * 4/100
+        let navDivHeight = window.outerHeight * 4 / 100;
+        let sideNavHeight = window.innerHeight - (2 * navDivHeight);
+        console.log('got window.innerHeight = ' + window.innerHeight + ', window.outerHeight = ' + window.outerHeight + ', navDivHeight = ' + navDivHeight + ', sideNavHeight = ' + sideNavHeight);
+        this.setHeightForElements(sideNavHeight, document.getElementsByClassName('left-nav'));
+        this.setHeightForElements(sideNavHeight, document.getElementsByClassName('right-nav'));
+      },
+
+      setHeightForElements: function(height, elements) {
+        let elementArr = Object.values(elements);
+        for (let i=0; i< elementArr.length; i++) {
+          elementArr[i].style.height = height + 'px';
+        }
       },
 
       homePage: function(pageContentDiv) {

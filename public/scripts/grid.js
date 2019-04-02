@@ -1,302 +1,271 @@
-"use strict";
+//"use strict";
 
-document.addEventListener("DOMContentLoaded", (evt) => {
-  window.addEventListener("touchstart", (evt) => {
-    //evt.preventDefault ();
-    handleTouchStart(evt);
-  }, {passive: false});
+const gridMaker = () => {
+  return {
+    makeGrid: function() {
+      let grid = '';
+      for (let i = 0; i < this.GRID_SIZE; i++) {
+        grid += this.makeOneRow(i);
+      }
+      let gridDiv = document.createElement('div');
+      gridDiv.innerHTML = grid;
+      let rootDiv = document.getElementById('root');
+      rootDiv.appendChild(gridDiv);
+      rootDiv.classList.add('full-grid-' + this.gridState.orientation);
+    },
 
-  window.addEventListener("touchmove", (evt) => {
-    evt.preventDefault();
-    handleTouchMove(evt);
-  }, {passive: false});
+    makeOneRow: function(rowPosition) {
+      let row = '', children = '';
+      //let rowId = getNextId();
+      for (let i = 0; i < this.GRID_SIZE; i++) {
+        children += this.makeOneCell(i, rowPosition);
+      }
+      row = '<div class="cell-3x1" id="row' + rowPosition + '">' + children + '</div>';
+      return row;
+    },
 
-  //window.addEventListener("touchcanel", (evt) => {
-    //evt.preventDefault ();
-    //handleTouchCancel(evt);
-  //  }, {passive: false});
-  //window.addEventListener("touchend", (evt) => {
-    //s   evt.preventDefault ();
-    //handleTouchEnd(evt);
-  //}, {passive: false});
+    makeOneCell: function(cellPosition, rowPosition) {
+      //let buttonId = getNextId();
+      //let subPageTopNavId = getNextId();
+      //let navData = {gotoRow: this.MIDDLE, gotoCell: this.MIDDLE};
+      //let button = '<button type="button" onClick=handleNav(navData) id="' + buttonId + '">home</button>';
+      //let subPageTopNav = '<div className="sub-page-top-nav" id="' + subPageTopNavId + '">' + button + '</div>';
+      let cell = '<div class="cell-1x1" id="cell' + cellPosition + '-row' + rowPosition + '"></div>'; //' + subPageTopNav + '
+      return cell;
+    },
 
-  window.addEventListener("orientationchange", (evt) => {
-    handleOrientationChange(evt);
-  }, {passive: false}); // setting passive to false means we want to interrupt the scrolling while we run this callback. This is the default anyway
-
-  window.addEventListener("load", (evt) => {
-    handleOrientationChange(evt);
-    let navData = {gotoRow: MIDDLE, gotoCell: MIDDLE};
-    handleNav(navData);
-  }, {passive: false});
-});
-
-const getUsableScreenSize = () => {
-  let chromeHeight = getCellHeight() - window.innerHeight;
-  let realWidth = window.innerWidth;
-  let realHeight = window.innerHeight;
-  alert('innerWidth=' + realWidth + ', innerHeight=' + realHeight + ', getCellWidth=' + getCellWidth() + ', getCellHeight=' + getCellHeight() + ', chromeHeight=' + chromeHeight);
-  //see https://css-tricks.com/the-trick-to-viewport-units-on-mobile/
-  // First we get the viewport width & height and we multiple them by 1% to get a value for the vw & vh units
-  //let vw = window.innerWidth * 0.01;
-  //let vh = window.innerHeight * 0.01;
-  // Then we set the value in the custom property to the root of the document
-  //document.documentElement.style.setProperty('--vw', `${vw}px`);
-  //document.documentElement.style.setProperty('--vh', `${vh}px`);
-}
-
-const makeGrid = () => {
-  let grid = '';
-  for (let i = 0; i < GRID_SIZE; i++) {
-    grid += makeOneRow(i);
-  }
-  let gridDiv = document.createElement('div');
-  gridDiv.innerHTML = grid;
-  let rootDiv = document.getElementById('root');
-  rootDiv.appendChild(gridDiv);
-}
-
-const makeOneRow = (rowPosition) => {
-  let row = '', children = '';
-  //let rowId = getNextId();
-  for (let i = 0; i < GRID_SIZE; i++) {
-    children += makeOneCell(i, rowPosition);
-  }
-  row = '<div class="cell-3x1" id="row' + rowPosition + '">' + children + '</div>';
-  return row;
-}
-
-const makeOneCell = (cellPosition, rowPosition) => {
-  //let buttonId = getNextId();
-  //let subPageTopNavId = getNextId();
-  //let navData = {gotoRow: MIDDLE, gotoCell: MIDDLE};
-  //let button = '<button type="button" onClick=handleNav(navData) id="' + buttonId + '">home</button>';
-  //let subPageTopNav = '<div className="sub-page-top-nav" id="' + subPageTopNavId + '">' + button + '</div>';
-  let cell = '<div class="cell-1x1" id="cell' + cellPosition + '-row' + rowPosition + '"></div>'; //' + subPageTopNav + '
-  return cell;
-}
-
-const getNextId = () => {
-  let currentId = gridState.nextId;
-  gridState.nextId += 1;
-  return currentId;
-}
-
-const handleNav = (navData) => {
-  // note that gotoCell and gotoRow will be 0, 1 or 2
-  let leftPosition = navData.gotoCell * getCellWidth();
-  let topPosition = navData.gotoRow * getCellHeight();
-  window.scroll({
-    top: topPosition,
-    left: leftPosition,
-    behavior: 'smooth'
-  });
-  log('handleNav, destination = ' + leftPosition + ', ' + topPosition);
-}
-
-const handleTouchStart = (evt) => {
-  // just want to capture scroll position and the touch position
-    let touch0 = evt.touches[0];
-    //log('touchStartPosition=(' + touch0.clientX + ',' + touch0.clientY + ') windowPosition=(' + window.pageXOffset + ',' + window.pageYOffset + ')');
-    gridState.touchStartPosition = [touch0.clientX, touch0.clientY];
-    gridState.windowPosition = [window.pageXOffset, window.pageYOffset];
-}
-
-/*
-* handleTouchMove - adjusts the scrolling of the window as expected, up until
-* it reaches a THRESHOLD, then the window srolls all the way to the next grid section
-*/
-const handleTouchMove = (evt) => {
-    //log('touch move');
-    let newTouchPosition = [evt.touches[0].clientX, evt.touches[0].clientY]
-    let distanceMoved = getDistanceMoved(newTouchPosition);
-
-    if (Math.abs(distanceMoved) > THRESHOLD * getCellWidth()) {
-      //log(' -> position exceeded THRESHOLD...now we want to scroll');
-      evt.preventDefault();
-      let travelDirection = getTravelDirection(newTouchPosition);
-      //log('handleTouchMove - travelDirection=' + travelDirection);
-      let newWindowPosition = getNewWindowPositionFromTravelDirection(travelDirection);
-      let correctedWindowPosition = keepWithinGridBoundaries(newWindowPosition);
+    handleNav: function(navData) {
+      // note that gotoCell and gotoRow will be 0, 1 or 2
+      let leftPosition = navData.gotoCell * this.getCellWidth();
+      let topPosition = navData.gotoRow * this.getCellHeight();
       window.scroll({
-        top: correctedWindowPosition[1],
-        left: correctedWindowPosition[0],
+        top: topPosition,
+        left: leftPosition,
         behavior: 'smooth'
       });
-    } else {
-      let moveVector = subtractVectors(newTouchPosition, gridState.touchStartPosition);
-      let reverseMoveVector = scaleVector(moveVector, -1);
-      let newScrollPosition = addVectors(gridState.windowPosition, reverseMoveVector);
-      window.scroll({
-        top: newScrollPosition[1],
-        left: newScrollPosition[0]
-      });
-    }
-}
+      this.log('handleNav, destination = ' + leftPosition + ', ' + topPosition);
+    },
 
-const handleTouchCancel = (evt) => {
-    log('touch cancel');
-}
+    handleTouchStart: function(evt) {
+      // just want to capture scroll position and the touch position
+      let touch0 = evt.touches[0];
+      this.gridState.touchStartPosition = [touch0.clientX, touch0.clientY];
+      this.gridState.windowPosition = [window.pageXOffset, window.pageYOffset];
+    },
 
-const handleTouchEnd = (evt) => {
-    log('touch end');
-}
+    /*
+    * handleTouchMove - adjusts the scrolling of the window as expected, up until
+    * it reaches a THRESHOLD, then the window srolls all the way to the next grid section
+    */
+    handleTouchMove: function(evt) {
+      let newTouchPosition = [evt.touches[0].clientX, evt.touches[0].clientY]
+      let distanceMoved = this.getDistanceMoved(newTouchPosition);
 
-/*
-* handleOrientationChange - when the deive is rotated, we need to update what the app considers
-* as the width and length, for use by handleTouchMove
-*/
-const handleOrientationChange = (evt) => {
-  toggleRootDivOrientation();
-  gridState.cellWidth = window.screen.width;
-  gridState.cellHeight = window.screen.height;
-}
+      if (Math.abs(distanceMoved) > this.THRESHOLD * this.getCellWidth()) {
+        evt.preventDefault();
+        let travelDirection = this.getTravelDirection(newTouchPosition);
+        let newWindowPosition = this.getNewWindowPositionFromTravelDirection(travelDirection);
+        let correctedWindowPosition = this.keepWithinGridBoundaries(newWindowPosition);
+        window.scroll({
+          top: correctedWindowPosition[1],
+          left: correctedWindowPosition[0],
+          behavior: 'smooth'
+        });
+      } else {
+        let moveVector = this.subtractVectors(newTouchPosition, this.gridState.touchStartPosition);
+        let reverseMoveVector = this.scaleVector(moveVector, -1);
+        let newScrollPosition = this.addVectors(this.gridState.windowPosition, reverseMoveVector);
+        window.scroll({
+          top: newScrollPosition[1],
+          left: newScrollPosition[0]
+        });
+      }
+    },
 
-const toggleRootDivOrientation = () => {
-  let rootDiv = document.getElementById('root');
-  if (window.screen.width < window.screen.height) {
-    rootDiv.classList.add('full-grid-portrait');
-    rootDiv.classList.remove('full-grid-landscape');
-  } else {
-    rootDiv.classList.add('full-grid-landscape');
-    rootDiv.classList.remove('full-grid-portrait');
-  }
-}
+    /*
+    * handleOrientationChange - when the deive is rotated, we need to update what the app considers
+    * as the width and length, for use by handleTouchMove
+    */
+    handleOrientationChange: function(evt, callback) {
+      let originalOrientation = this.gridState.orientation;
+      let newOrientation = this.setOrientation();
+      if (originalOrientation == newOrientation) {
+        setTimeout(this.handleOrientationChange, 500, evt, callback);
+      } else {
+        this.toggleRootDivOrientation();
+        this.gridState.cellWidth = window.innerWidth; //window.screen.width;
+        this.gridState.cellHeight = window.innerHeight; //window.screen.height;
+        if (callback) {
+            callback();
+        }
+      }
+    },
 
-const getDistanceMoved = (newTouchPosition) => {
-  let differenceBetweenStartAndEndPositions = subtractVectors(newTouchPosition, gridState.touchStartPosition);
-  return getVectorLength(differenceBetweenStartAndEndPositions);
-}
+    toggleRootDivOrientation: function() {
+      let rootDiv = document.getElementById('root');
+      if (window.screen.width < window.screen.height) {
+        rootDiv.classList.add('full-grid-portrait');
+        rootDiv.classList.remove('full-grid-landscape');
+      } else {
+        rootDiv.classList.add('full-grid-landscape');
+        rootDiv.classList.remove('full-grid-portrait');
+      }
+    },
 
-/*
-* getTravelDirection - when the user is in the middle of a touchMove, determine
-* the compass direction the user is heading in (east, northeast, etc), based on their direction of travel
-*/
-const getTravelDirection = (newTouchPosition) => {
-  if (gridState.touchStartPosition.length !== 2 || newTouchPosition.length !== 2) {
-    throw new Error('both touchStartPosition and newTouchPosition must be arrays of length 2');
-  }
-  let xDistanceTraveled = newTouchPosition[0] - gridState.touchStartPosition[0];
-  let yDistanceTraveled = newTouchPosition[1] - gridState.touchStartPosition[1];
-  let angleOfTravel = Math.atan2(yDistanceTraveled, xDistanceTraveled);
-  return getCompassPoint(angleOfTravel);
-}
+    getDistanceMoved: function(newTouchPosition) {
+      let differenceBetweenStartAndEndPositions = this.subtractVectors(newTouchPosition, this.gridState.touchStartPosition);
+      return this.getVectorLength(differenceBetweenStartAndEndPositions);
+    },
 
-/*
-* given an angle, return the closest compass direction (east, northeast, etc)
-*/
-const getCompassPoint = (angleOfTravel) => {
-  let closestDirection = Object.keys(directions).reduce((result, direction) => {
-    if (direction == 'west') {
-      if ((angleOfTravel < directions[direction].range[0]) || (angleOfTravel > directions[direction].range[1])) {
+    /*
+    * getTravelDirection - when the user is in the middle of a touchMove, determine
+    * the compass direction the user is heading in (east, northeast, etc), based on their direction of travel
+    */
+    getTravelDirection: function(newTouchPosition) {
+      if (this.gridState.touchStartPosition.length !== 2 || newTouchPosition.length !== 2) {
+        throw new Error('both touchStartPosition and newTouchPosition must be arrays of length 2');
+      }
+      let xDistanceTraveled = newTouchPosition[0] - this.gridState.touchStartPosition[0];
+      let yDistanceTraveled = newTouchPosition[1] - this.gridState.touchStartPosition[1];
+      let angleOfTravel = Math.atan2(yDistanceTraveled, xDistanceTraveled);
+      return this.getCompassPoint(angleOfTravel);
+    },
+
+    /*
+    * given an angle, return the closest compass direction (east, northeast, etc)
+    */
+    getCompassPoint: function(angleOfTravel) {
+      let closestDirection = Object.keys(directions).reduce((result, direction) => {
+        if (direction == 'west') {
+          if ((angleOfTravel < directions[direction].range[0]) || (angleOfTravel > directions[direction].range[1])) {
+              result = direction;
+            }
+        } else if (angleOfTravel > directions[direction].range[0] && angleOfTravel <= directions[direction].range[1]) {
           result = direction;
         }
-    } else if (angleOfTravel > directions[direction].range[0] && angleOfTravel <= directions[direction].range[1]) {
-      result = direction;
-    }
-    return result;
-  }, null);
-  return closestDirection;
-}
+        return result;
+      }, null);
+      return closestDirection;
+    },
 
-const getNewWindowPositionFromTravelDirection = (travelDirection) => {
-  // direction vector is a unit vector. e.g. [1,-1] tells us to move 1 screen width right and 1 screen height down
-  let directionVector = directions[travelDirection]['vector'];
-  let reverseDirectionVector = scaleVector(directionVector, -1);
-  let newWindowPositionX = gridState.windowPosition[0] + getCellWidth() * reverseDirectionVector[0];
-  let newWindowPositionY = gridState.windowPosition[1] + getCellHeight() * reverseDirectionVector[1];
-  return([newWindowPositionX, newWindowPositionY]);
-}
+    getNewWindowPositionFromTravelDirection: function(travelDirection) {
+      // direction vector is a unit vector. e.g. [1,-1] tells us to move 1 screen width right and 1 screen height down
+      let directionVector = directions[travelDirection]['vector'];
+      let reverseDirectionVector = this.scaleVector(directionVector, -1);
+      let newWindowPositionX = this.gridState.windowPosition[0] + this.getCellWidth() * reverseDirectionVector[0];
+      let newWindowPositionY = this.gridState.windowPosition[1] + this.getCellHeight() * reverseDirectionVector[1];
+      return([newWindowPositionX, newWindowPositionY]);
+    },
 
-const keepWithinGridBoundaries = (windowPosition) => {
-  let x = windowPosition[0];
-  let y = windowPosition[1];
-  if (windowPosition[0] > GRID_SIZE * getCellWidth()) {
-    x = GRID_SIZE * getCellWidth();
-  } else if (windowPosition[0] < 0) {
-    x = 0;
+    keepWithinGridBoundaries: function(windowPosition) {
+      let x = windowPosition[0];
+      let y = windowPosition[1];
+      if (windowPosition[0] > this.GRID_SIZE * this.getCellWidth()) {
+        x = this.GRID_SIZE * this.getCellWidth();
+      } else if (windowPosition[0] < 0) {
+        x = 0;
+      }
+      if (windowPosition[1] > this.GRID_SIZE * this.getCellHeight()) {
+        y = this.GRID_SIZE * this.getCellHeight();
+      } else if (windowPosition[1] < 0) {
+        y = 0;
+      }
+      return [x,y];
+    },
+
+    getCellWidth: function() {
+      if (this.gridState.cellWidth === null) {
+        this.gridState.cellWidth = document.getElementsByClassName('cell-1x1')[0].clientWidth;
+      }
+      return this.gridState.cellWidth;
+    },
+
+    getCellHeight: function() {
+      //if (this.gridState.cellHeight === null) {
+        let initialHeight = document.getElementsByClassName('cell-1x1')[0].clientHeight;
+        if (window.innerHeight < initialHeight) {
+          this.gridState.cellHeight = window.innerHeight;
+          document.getElementsByClassName('cell-1x1')[0].style.height = this.gridState.cellHeight;
+        } else {
+          this.gridState.cellHeight = initialHeight;
+        }
+        // all possibilities:
+        // document.getElementsByClassName('cell-1x1')[0].clientHeight;
+        // document.getElementsByClassName('cell-1x1')[0].offsetHeight; // this seems to be bigger; the whole viewable window including scroll bars
+        // document.getElementsByClassName('cell-1x1')[0].scrollHeight;
+      //}
+      return this.gridState.cellHeight;
+    },
+
+    addVectors: function(vect1, vect2) {
+      if (vect1.length !== 2 || vect2.length !== 2 ) {
+        throw new Error('both vectors must be arrays of length 2');
+      }
+      return [vect1[0] + vect2[0], vect1[1] + vect2[1]];
+    },
+
+    subtractVectors: function(vect1, vect2) {
+      if (vect1.length !== 2 || vect2.length !== 2 ) {
+        throw new Error('both vectors must be arrays of length 2');
+      }
+      return [vect1[0] - vect2[0], vect1[1] - vect2[1]];
+    },
+
+    scaleVector: function(vect1, scalar) {
+      if (vect1.length !== 2 || typeof scalar != 'number') {
+        throw new Error('the vector must be an array of length 2 and the scalar must be a number');
+      }
+      return [vect1[0] * scalar, vect1[1] * scalar];
+    },
+
+    getVectorLength: function(vector) {
+      let sumOfSquares = 0;
+      for (let i=0; i<vector.length; i++) {
+        sumOfSquares += vector[i] * vector[i];
+      }
+      return Math.sqrt(sumOfSquares);
+    },
+
+    log: function(message) {
+      if (this.gridState.loggingOn) {
+        console.log(message);
+      }
+    },
+
+    setOrientation: function() {
+      if (window.screen.height > window.screen.width) {
+        this.gridState.orientation = 'portrait';
+      } else {
+        this.gridState.orientation = 'landscape';
+      }
+      this.log('orientation is now ' + this.gridState.orientation);
+      return this.gridState.orientation;
+    },
+
+    gridState: {
+      loggingOn: true,
+      cellWidth: null,
+      cellHeight: null,
+      windowPosition: [],
+      touchStartPosition: [],
+      orientation: null,
+    },
+
+    /*** some constants, for easy reading ***/
+    GRID_SIZE: 3,
+    //const TOP = 0;
+    MIDDLE: 1,
+    //const BOTTOM = 2;
+    //const LEFT = 0;
+    //const RIGHT = 2;
+    THRESHOLD: 0.25,
+
+    /* handleTouchCancel: function(evt) {
+        log('touch cancel');
+    },
+
+    handleTouchEnd: function(evt) {
+        log('touch end');
+    }, */
   }
-  if (windowPosition[1] > GRID_SIZE * getCellHeight()) {
-    y = GRID_SIZE * getCellHeight();
-  } else if (windowPosition[1] < 0) {
-    y = 0;
-  }
-  return [x,y];
 }
-
-const getCellWidth = () => {
-  if (gridState.cellWidth === null) {
-    gridState.cellWidth = document.getElementsByClassName('cell-1x1')[0].clientWidth;
-  }
-  return gridState.cellWidth;
-}
-
-const getCellHeight = () => {
-  //if (gridState.cellHeight === null) {
-    let initialHeight = document.getElementsByClassName('cell-1x1')[0].clientHeight;
-    if (window.innerHeight < initialHeight) {
-      gridState.cellHeight = window.innerHeight;
-      document.getElementsByClassName('cell-1x1')[0].style.height = gridState.cellHeight;
-    } else {
-      gridState.cellHeight = initialHeight;
-    }
-    // all possibilities:
-    // document.getElementsByClassName('cell-1x1')[0].clientHeight;
-    // document.getElementsByClassName('cell-1x1')[0].offsetHeight; // this seems to be bigger; the whole viewable window including scroll bars
-    // document.getElementsByClassName('cell-1x1')[0].scrollHeight;
-  //}
-  return gridState.cellHeight;
-}
-
-const addVectors = (vect1, vect2) => {
-  if (vect1.length !== 2 || vect2.length !== 2 ) {
-    throw new Error('both vectors must be arrays of length 2');
-  }
-  return [vect1[0] + vect2[0], vect1[1] + vect2[1]];
-}
-
-const subtractVectors = (vect1, vect2) => {
-  if (vect1.length !== 2 || vect2.length !== 2 ) {
-    throw new Error('both vectors must be arrays of length 2');
-  }
-  return [vect1[0] - vect2[0], vect1[1] - vect2[1]];
-}
-
-const scaleVector = (vect1, scalar) => {
-  if (vect1.length !== 2 || typeof scalar != 'number') {
-    throw new Error('the vector must be an array of length 2 and the scalar must be a number');
-  }
-  return [vect1[0] * scalar, vect1[1] * scalar];
-}
-
-const getVectorLength = (vector) => {
-  let sumOfSquares = 0;
-  for (let i=0; i<vector.length; i++) {
-    sumOfSquares += vector[i] * vector[i];
-  }
-  return Math.sqrt(sumOfSquares);
-}
-
-const log = (message) => {
-  if (gridState.loggingOn) {
-    console.log(message);
-  }
-}
-
-const gridState = {
-  loggingOn: true,
-  nextId: 0,
-  cellWidth: null,
-  cellHeight: null,
-  windowPosition: [],
-  touchStartPosition: [],
-}
-
-/*** some constants, for easy reading ***/
-const GRID_SIZE = 3;
-//const TOP = 0;
-const MIDDLE = 1;
-//const BOTTOM = 2;
-//const LEFT = 0;
-//const RIGHT = 2;
-const THRESHOLD = 0.25;
