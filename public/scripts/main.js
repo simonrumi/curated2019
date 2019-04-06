@@ -21,8 +21,7 @@ document.addEventListener("DOMContentLoaded", (evt) => {
   }, {passive: false});
 
   window.addEventListener("orientationchange", (evt) => {
-    grid.handleOrientationChange(evt, buildIt.correctSideNavHeights.bind(buildIt));
-    console.log("the orientation of the device is now " + screen.orientation.angle);
+    grid.handleOrientationChange(evt).then(buildIt.correctSideNavHeights.bind(buildIt));
     //buildIt.correctSideNavHeights();
   }, {passive: false}); // setting passive to false means we want to interrupt the scrolling while we run this callback. This is the default anyway
 

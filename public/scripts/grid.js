@@ -86,19 +86,21 @@ const gridMaker = () => {
     * handleOrientationChange - when the deive is rotated, we need to update what the app considers
     * as the width and length, for use by handleTouchMove
     */
-    handleOrientationChange: function(evt, callback) {
-      let originalOrientation = this.gridState.orientation;
-      let newOrientation = this.setOrientation();
-      if (originalOrientation == newOrientation) {
-        setTimeout(this.handleOrientationChange, 500, evt, callback);
-      } else {
-        this.toggleRootDivOrientation();
-        this.gridState.cellWidth = window.innerWidth; //window.screen.width;
-        this.gridState.cellHeight = window.innerHeight; //window.screen.height;
-        if (callback) {
-            callback();
-        }
-      }
+    handleOrientationChange: function(evt) {
+      //let originalOrientation = this.gridState.orientation;
+      //let newOrientation = this.setOrientation();
+      //if (originalOrientation == newOrientation) {
+        //setTimeout(this.handleOrientationChange, 500, evt, callback);
+      //} else {
+      let orientationPromise = new Promise(function(resolve, reject) {
+        setTimeout(function() {
+          this.toggleRootDivOrientation();
+          this.gridState.cellWidth = window.outerWidth; //window.screen.width;
+          this.gridState.cellHeight = window.outerHeight; //window.screen.height;
+          resolve(true);
+        }.bind(this), 50);
+      }.bind(this));
+      return orientationPromise;
     },
 
     toggleRootDivOrientation: function() {
