@@ -84,7 +84,7 @@ const gridMaker = () => {
     handleOrientationChange: function(evt) {
       let orientationPromise = new Promise(function(resolve, reject) {
         setTimeout(function() {
-          this.toggleRootDivOrientation();
+          this.updateRootDivOrientation();
           this.gridState.cellWidth = window.outerWidth; //window.screen.width;
           this.gridState.cellHeight = window.outerHeight; //window.screen.height;
           resolve(true);
@@ -95,9 +95,12 @@ const gridMaker = () => {
 
     handleWindowRezise: function(evt) {
       console.log('window innerHeight = ' + window.innerHeight);
+      this.updateRootDivOrientation();
+      this.gridState.cellWidth = window.innerWidth;
+      this.gridState.cellHeight = window.innerHeight;
     },
 
-    toggleRootDivOrientation: function() {
+    updateRootDivOrientation: function() {
       let rootDiv = document.getElementById('root');
       if (window.screen.width < window.screen.height) {
         rootDiv.classList.add('full-grid-portrait');

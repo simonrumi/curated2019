@@ -20,13 +20,14 @@ document.addEventListener("DOMContentLoaded", (evt) => {
     grid.handleTouchMove(evt);
   }, {passive: false});
 
-  window.addEventListener("orientationchange", (evt) => {
+  /*window.addEventListener("orientationchange", (evt) => {
     grid.handleOrientationChange(evt).then(buildIt.correctSideNavHeights.bind(buildIt));
     //buildIt.correctSideNavHeights();
-  }, {passive: false});
+  }, {passive: false});*/
 
   window.addEventListener("resize", (evt) => {
-    grid.handleWindowRezise(evt);
+    grid.handleWindowRezise();
+    buildIt.correctSideNavHeights();
   }, {passive: true}); // setting passive to true means we do not want to interrupt the scrolling while we run this callback.
 
   window.addEventListener("load", (evt) => {
