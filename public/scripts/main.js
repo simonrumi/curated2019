@@ -5,9 +5,15 @@ document.addEventListener("DOMContentLoaded", (evt) => {
   grid.setOrientation();
   grid.makeGrid();
   let buildIt = pageBuilder(grid);
-  let homePageContentDiv = buildIt.boilerplate('cell1-row1');
+  let cells = Object.values(directions);
+  cells.forEach((cell) => {
+    buildIt.boilerplate('cell' + cell['gridPosition'][0] + '-row' + cell['gridPosition'][1]);
+  });
+  //let homePageContentDiv = buildIt.boilerplate('cell1-row1');
+  let homePageCell = document.getElementById('cell1-row1');
+  let homePageContentDiv = homePageCell.getElementsByClassName('page-content')[0];
   buildIt.homePage(homePageContentDiv);
-  let topPageContentDiv = buildIt.boilerplate('cell1-row0');
+  //let topPageContentDiv = buildIt.boilerplate('cell1-row0');
   buildIt.correctSideNavHeights();
 
   window.addEventListener("touchstart", (evt) => {

@@ -80,7 +80,7 @@ const gridMaker = () => {
     /*
     * handleOrientationChange - when the deive is rotated, we need to update what the app considers
     * as the width and length, for use by handleTouchMove
-    */
+
     handleOrientationChange: function(evt) {
       let orientationPromise = new Promise(function(resolve, reject) {
         setTimeout(function() {
@@ -91,7 +91,7 @@ const gridMaker = () => {
         }.bind(this), 50);
       }.bind(this));
       return orientationPromise;
-    },
+    },*/
 
     handleWindowRezise: function(evt) {
       console.log('window innerHeight = ' + window.innerHeight);

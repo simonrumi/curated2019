@@ -55,4 +55,11 @@ const directions = {
     'classes': ['align-left'],
     'gridPosition': [0, 2],
   },
+  'center': {
+    'vector': [0,0],
+    'range': [0, 0],
+    'img': '<img src="" class=""/>',
+    'classes': [],
+    'gridPosition': [1, 1],
+  },
 }
