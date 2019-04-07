@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", (evt) => {
   let grid = gridMaker();
   grid.setOrientation();
   grid.makeGrid();
-  let buildIt = pageBuilder();
+  let buildIt = pageBuilder(grid);
   let homePageContentDiv = buildIt.boilerplate('cell1-row1');
   buildIt.homePage(homePageContentDiv);
   let topPageContentDiv = buildIt.boilerplate('cell1-row0');
@@ -27,7 +27,7 @@ document.addEventListener("DOMContentLoaded", (evt) => {
 
   window.addEventListener("load", (evt) => {
     //grid.handleOrientationChange(evt, buildIt.correctSideNavHeights.bind(buildIt));
-    let navData = {gotoRow: grid.MIDDLE, gotoCell: grid.MIDDLE};
+    let navData = [grid.MIDDLE, grid.MIDDLE];
     grid.handleNav(navData);
   }, {passive: false});
 });

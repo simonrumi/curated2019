@@ -25,19 +25,14 @@ const gridMaker = () => {
     },
 
     makeOneCell: function(cellPosition, rowPosition) {
-      //let buttonId = getNextId();
-      //let subPageTopNavId = getNextId();
-      //let navData = {gotoRow: this.MIDDLE, gotoCell: this.MIDDLE};
-      //let button = '<button type="button" onClick=handleNav(navData) id="' + buttonId + '">home</button>';
-      //let subPageTopNav = '<div className="sub-page-top-nav" id="' + subPageTopNavId + '">' + button + '</div>';
       let cell = '<div class="cell-1x1" id="cell' + cellPosition + '-row' + rowPosition + '"></div>'; //' + subPageTopNav + '
       return cell;
     },
 
     handleNav: function(navData) {
       // note that gotoCell and gotoRow will be 0, 1 or 2
-      let leftPosition = navData.gotoCell * this.getCellWidth();
-      let topPosition = navData.gotoRow * this.getCellHeight();
+      let leftPosition = navData[0] * this.getCellWidth();
+      let topPosition = navData[1] * this.getCellHeight();
       window.scroll({
         top: topPosition,
         left: leftPosition,
@@ -87,11 +82,6 @@ const gridMaker = () => {
     * as the width and length, for use by handleTouchMove
     */
     handleOrientationChange: function(evt) {
-      //let originalOrientation = this.gridState.orientation;
-      //let newOrientation = this.setOrientation();
-      //if (originalOrientation == newOrientation) {
-        //setTimeout(this.handleOrientationChange, 500, evt, callback);
-      //} else {
       let orientationPromise = new Promise(function(resolve, reject) {
         setTimeout(function() {
           this.toggleRootDivOrientation();
@@ -255,11 +245,11 @@ const gridMaker = () => {
 
     /*** some constants, for easy reading ***/
     GRID_SIZE: 3,
-    //const TOP = 0;
+    TOP: 0,
     MIDDLE: 1,
-    //const BOTTOM = 2;
-    //const LEFT = 0;
-    //const RIGHT = 2;
+    BOTTOM: 2,
+    LEFT: 0,
+    RIGHT: 2,
     THRESHOLD: 0.25,
 
     /* handleTouchCancel: function(evt) {

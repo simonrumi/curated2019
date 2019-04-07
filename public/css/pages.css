@@ -23,7 +23,6 @@ p {
 
 .page-middle {
   position: relative;
-  clear: both;
   width: 100%;
 }
 
@@ -55,9 +54,16 @@ p {
   float: right;
 }
 
+.align-center {
+  margin: 0 auto;
+}
+
+.clear {
+  clear: both;
+}
+
 .text-block-med {
   max-height: 33vh;
-  clear: both;
 }
 
 .curated-logo {
