@@ -23,10 +23,13 @@ document.addEventListener("DOMContentLoaded", (evt) => {
   window.addEventListener("orientationchange", (evt) => {
     grid.handleOrientationChange(evt).then(buildIt.correctSideNavHeights.bind(buildIt));
     //buildIt.correctSideNavHeights();
-  }, {passive: false}); // setting passive to false means we want to interrupt the scrolling while we run this callback. This is the default anyway
+  }, {passive: false});
+
+  window.addEventListener("resize", (evt) => {
+    grid.handleWindowRezise(evt);
+  }, {passive: true}); // setting passive to true means we do not want to interrupt the scrolling while we run this callback.
 
   window.addEventListener("load", (evt) => {
-    //grid.handleOrientationChange(evt, buildIt.correctSideNavHeights.bind(buildIt));
     let navData = [grid.MIDDLE, grid.MIDDLE];
     grid.handleNav(navData);
   }, {passive: false});

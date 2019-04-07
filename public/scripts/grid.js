@@ -93,6 +93,10 @@ const gridMaker = () => {
       return orientationPromise;
     },
 
+    handleWindowRezise: function(evt) {
+      console.log('window innerHeight = ' + window.innerHeight);
+    },
+
     toggleRootDivOrientation: function() {
       let rootDiv = document.getElementById('root');
       if (window.screen.width < window.screen.height) {
