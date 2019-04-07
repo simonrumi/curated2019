@@ -13,11 +13,11 @@ const pageBuilder = (grid) => {
       boilerplate: function(cellId) {
         let pageContainer = document.getElementById(cellId);
 
-        // note that the buttons have to be appended in the order left, right, center
-        // otherwise the right button will be pushed down a line
+        // note that divs have to be appended in the order left, right, center
+        // otherwise the right div will be pushed down a line
 
         let topNav = document.createElement('div');
-        topNav.classList.add('nav');
+        topNav.classList.add('nav', 'nav-top');
 
         let northWestBtn = makeNavBtn('northwest');
         topNav.appendChild(northWestBtn);
@@ -48,7 +48,7 @@ const pageBuilder = (grid) => {
         pageContainer.appendChild(pageMiddle);
 
         let bottomNav = document.createElement('div');
-        bottomNav.classList.add('nav', 'clear');
+        bottomNav.classList.add('nav', 'clear', 'nav-bottom');
 
         let southWestBtn = makeNavBtn('southwest');
         bottomNav.appendChild(southWestBtn);
@@ -65,14 +65,11 @@ const pageBuilder = (grid) => {
       },
 
       correctSideNavHeights: function() {
-        // nav divs have max-height: 4vh
-        // since the nav imagees are large, this will push the size to the max height
-        // so the height of the nav divs will be window.outerHeight * 4/100
-        let navDivHeight = window.outerHeight * 4 / 100;
-        let sideNavHeight = window.innerHeight - (2 * navDivHeight);
-        console.log('got window.innerHeight = ' + window.innerHeight + ', window.outerHeight = ' + window.outerHeight + ', navDivHeight = ' + navDivHeight + ', sideNavHeight = ' + sideNavHeight);
-        this.setHeightForElements(sideNavHeight, document.getElementsByClassName('left-nav'));
-        this.setHeightForElements(sideNavHeight, document.getElementsByClassName('right-nav'));
+        let navDivHeightPx = window.outerHeight * this.NAV_DIV_HEIGHT / 100;
+        let sideNavHeightPx = window.innerHeight - (2 * navDivHeightPx);
+        console.log('got window.innerHeight = ' + window.innerHeight + ', window.outerHeight = ' + window.outerHeight + ', navDivHeight = ' + navDivHeightPx + ', sideNavHeight = ' + sideNavHeightPx);
+        this.setHeightForElements(sideNavHeightPx, document.getElementsByClassName('left-nav'));
+        this.setHeightForElements(sideNavHeightPx, document.getElementsByClassName('right-nav'));
       },
 
       setHeightForElements: function(height, elements) {
@@ -96,5 +93,9 @@ const pageBuilder = (grid) => {
         logo.innerHTML = '<img src="/img/curated-logo-min.png"/>';
         pageContentDiv.appendChild(logo);
       },
+
+      // top & bottom nav divs have max-height: 4vh
+      // plus there is 1vh for padding
+      NAV_DIV_HEIGHT: 5,
     }
 }

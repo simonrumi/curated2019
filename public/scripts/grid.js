@@ -77,24 +77,7 @@ const gridMaker = () => {
       }
     },
 
-    /*
-    * handleOrientationChange - when the deive is rotated, we need to update what the app considers
-    * as the width and length, for use by handleTouchMove
-
-    handleOrientationChange: function(evt) {
-      let orientationPromise = new Promise(function(resolve, reject) {
-        setTimeout(function() {
-          this.updateRootDivOrientation();
-          this.gridState.cellWidth = window.outerWidth; //window.screen.width;
-          this.gridState.cellHeight = window.outerHeight; //window.screen.height;
-          resolve(true);
-        }.bind(this), 50);
-      }.bind(this));
-      return orientationPromise;
-    },*/
-
     handleWindowRezise: function(evt) {
-      console.log('window innerHeight = ' + window.innerHeight);
       this.updateRootDivOrientation();
       this.gridState.cellWidth = window.innerWidth;
       this.gridState.cellHeight = window.innerHeight;
@@ -159,14 +142,14 @@ const gridMaker = () => {
     keepWithinGridBoundaries: function(windowPosition) {
       let x = windowPosition[0];
       let y = windowPosition[1];
-      if (windowPosition[0] > this.GRID_SIZE * this.getCellWidth()) {
+      if (x > this.GRID_SIZE * this.getCellWidth()) {
         x = this.GRID_SIZE * this.getCellWidth();
-      } else if (windowPosition[0] < 0) {
+      } else if (x < 0) {
         x = 0;
       }
-      if (windowPosition[1] > this.GRID_SIZE * this.getCellHeight()) {
+      if (y > this.GRID_SIZE * this.getCellHeight()) {
         y = this.GRID_SIZE * this.getCellHeight();
-      } else if (windowPosition[1] < 0) {
+      } else if (y < 0) {
         y = 0;
       }
       return [x,y];
@@ -180,19 +163,17 @@ const gridMaker = () => {
     },
 
     getCellHeight: function() {
-      //if (this.gridState.cellHeight === null) {
-        let initialHeight = document.getElementsByClassName('cell-1x1')[0].clientHeight;
-        if (window.innerHeight < initialHeight) {
-          this.gridState.cellHeight = window.innerHeight;
-          document.getElementsByClassName('cell-1x1')[0].style.height = this.gridState.cellHeight;
-        } else {
-          this.gridState.cellHeight = initialHeight;
-        }
-        // all possibilities:
-        // document.getElementsByClassName('cell-1x1')[0].clientHeight;
-        // document.getElementsByClassName('cell-1x1')[0].offsetHeight; // this seems to be bigger; the whole viewable window including scroll bars
-        // document.getElementsByClassName('cell-1x1')[0].scrollHeight;
-      //}
+      let initialHeight = document.getElementsByClassName('cell-1x1')[0].clientHeight;
+      if (window.innerHeight < initialHeight) {
+        this.gridState.cellHeight = window.innerHeight;
+        document.getElementsByClassName('cell-1x1')[0].style.height = this.gridState.cellHeight;
+      } else {
+        this.gridState.cellHeight = initialHeight;
+      }
+      // all possibilities:
+      // document.getElementsByClassName('cell-1x1')[0].clientHeight;
+      // document.getElementsByClassName('cell-1x1')[0].offsetHeight; // this seems to be bigger; the whole viewable window including scroll bars
+      // document.getElementsByClassName('cell-1x1')[0].scrollHeight;
       return this.gridState.cellHeight;
     },
 
@@ -257,7 +238,7 @@ const gridMaker = () => {
     BOTTOM: 2,
     LEFT: 0,
     RIGHT: 2,
-    THRESHOLD: 0.25,
+    THRESHOLD: 0.18,
 
     /* handleTouchCancel: function(evt) {
         log('touch cancel');
