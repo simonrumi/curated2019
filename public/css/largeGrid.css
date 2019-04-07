@@ -25,23 +25,18 @@ width: calc(var(--vw, 1vw) * 300); */ /* see https://css-tricks.com/the-trick-to
 
 .cell-1x1 {
 	width: 100vw;
-	height: 100vh;
-  /*padding: 1vh 1vw;*/
-  /*display: table;*/
+	/*height: 100vh;*/
   vertical-align: middle;
   text-align: center;
 }
 
 .cell-3x1 {
 	width: 300vw;
-	height: 100vh;
+	/*height: 100vh;*/
 }
 
 [class*="cell-"] {
 	display: inline-block;
-	/*border-style: dashed solid;
-	border-width: 1px;
-  border-color: #ffc5ca;*/
 	scroll-behavior: smooth; /* not supported in iOS though */
 	white-space: nowrap;
 }
