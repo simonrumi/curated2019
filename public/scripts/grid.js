@@ -1,4 +1,5 @@
-//"use strict";
+ // TODO: on rotate, realign to current cell (so first need to store current cell)
+ // TODO: adjust buttons so they point to adjacent cells
 
 const gridMaker = () => {
   return {
@@ -16,7 +17,6 @@ const gridMaker = () => {
 
     makeOneRow: function(rowPosition) {
       let row = '', children = '';
-      //let rowId = getNextId();
       for (let i = 0; i < this.GRID_SIZE; i++) {
         children += this.makeOneCell(i, rowPosition);
       }
@@ -25,20 +25,20 @@ const gridMaker = () => {
     },
 
     makeOneCell: function(cellPosition, rowPosition) {
-      let cell = '<div class="cell-1x1" id="cell' + cellPosition + '-row' + rowPosition + '"></div>'; //' + subPageTopNav + '
+      let cell = '<div class="cell-1x1" id="cell' + cellPosition + '-row' + rowPosition + '"></div>';
       return cell;
     },
 
+    initPosition: function() {
+      let centerCell = [this.MIDDLE, this.MIDDLE];
+      this.gridState.viewableCell = centerCell;
+      this.moveWindowToCell(centerCell);
+    },
+
     handleNav: function(navData) {
-      // note that gotoCell and gotoRow will be 0, 1 or 2
       let leftPosition = navData[0] * this.getCellWidth();
       let topPosition = navData[1] * this.getCellHeight();
-      window.scroll({
-        top: topPosition,
-        left: leftPosition,
-        behavior: 'smooth'
-      });
-      this.log('handleNav, destination = ' + leftPosition + ', ' + topPosition);
+      this.moveWindowToPosition([leftPosition, topPosition]);
     },
 
     handleTouchStart: function(evt) {
@@ -53,27 +53,28 @@ const gridMaker = () => {
     * it reaches a THRESHOLD, then the window srolls all the way to the next grid section
     */
     handleTouchMove: function(evt) {
-      let newTouchPosition = [evt.touches[0].clientX, evt.touches[0].clientY]
-      let distanceMoved = this.getDistanceMoved(newTouchPosition);
-
-      if (Math.abs(distanceMoved) > this.THRESHOLD * this.getCellWidth()) {
+      if (this.gridState.isScrolling) {
+        // do nothing as we're already moving somewhere
         evt.preventDefault();
-        let travelDirection = this.getTravelDirection(newTouchPosition);
-        let newWindowPosition = this.getNewWindowPositionFromTravelDirection(travelDirection);
-        let correctedWindowPosition = this.keepWithinGridBoundaries(newWindowPosition);
-        window.scroll({
-          top: correctedWindowPosition[1],
-          left: correctedWindowPosition[0],
-          behavior: 'smooth'
-        });
       } else {
-        let moveVector = this.subtractVectors(newTouchPosition, this.gridState.touchStartPosition);
-        let reverseMoveVector = this.scaleVector(moveVector, -1);
-        let newScrollPosition = this.addVectors(this.gridState.windowPosition, reverseMoveVector);
-        window.scroll({
-          top: newScrollPosition[1],
-          left: newScrollPosition[0]
-        });
+        let newTouchPosition = [evt.touches[0].clientX, evt.touches[0].clientY]
+        let distanceMoved = this.getDistanceMoved(newTouchPosition);
+        let thresholdDistance = this.THRESHOLD * this.getMinimumDimension();
+        this.log('distanceMoved = ' + distanceMoved + ', thresholdDistance = ' + thresholdDistance)
+        if (Math.abs(distanceMoved) > thresholdDistance) {
+          evt.preventDefault();
+          let travelDirection = this.getTravelDirection(newTouchPosition);
+          //let newWindowPosition = this.getNewWindowPositionFromTravelDirection(travelDirection);
+          //let correctedWindowPosition = this.keepWithinGridBoundaries(newWindowPosition);
+          //this.moveWindowToPosition(correctedWindowPosition);
+          this.gridState.viewableCell = this.getNewViewableCellFromTravelDirection(travelDirection);
+          this.moveWindowToCell(this.gridState.viewableCell);
+        } else {
+          let moveVector = this.subtractVectors(newTouchPosition, this.gridState.touchStartPosition);
+          let reverseMoveVector = this.scaleVector(moveVector, -1);
+          let newScrollPosition = this.addVectors(this.gridState.windowPosition, reverseMoveVector);
+          this.moveWindowToPosition(newScrollPosition);
+        }
       }
     },
 
@@ -81,6 +82,7 @@ const gridMaker = () => {
       this.updateRootDivOrientation();
       this.gridState.cellWidth = window.innerWidth;
       this.gridState.cellHeight = window.innerHeight;
+      this.handleNav(this.gridState.viewableCell);
     },
 
     updateRootDivOrientation: function() {
@@ -130,16 +132,37 @@ const gridMaker = () => {
       return closestDirection;
     },
 
-    getNewWindowPositionFromTravelDirection: function(travelDirection) {
+    /*getNewWindowPositionFromTravelDirection: function(travelDirection) {
       // direction vector is a unit vector. e.g. [1,-1] tells us to move 1 screen width right and 1 screen height down
       let directionVector = directions[travelDirection]['vector'];
       let reverseDirectionVector = this.scaleVector(directionVector, -1);
       let newWindowPositionX = this.gridState.windowPosition[0] + this.getCellWidth() * reverseDirectionVector[0];
       let newWindowPositionY = this.gridState.windowPosition[1] + this.getCellHeight() * reverseDirectionVector[1];
       return([newWindowPositionX, newWindowPositionY]);
+    },*/
+
+    getNewViewableCellFromTravelDirection: function(travelDirection) {
+      let directionVector = directions[travelDirection]['vector'];
+      let reverseDirectionVector = this.scaleVector(directionVector, -1);
+      let newViewableCell = this.addVectors(reverseDirectionVector, this.gridState.viewableCell);
+
+      if (newViewableCell[0] < this.LEFT) {
+        newViewableCell[0] = this.LEFT;
+      } else if (newViewableCell[0] > this.RIGHT) {
+        newViewableCell[0] = this.RIGHT;
+      }
+
+      if (newViewableCell[1] < this.TOP) {
+        newViewableCell[1] = this.TOP;
+      } else if (newViewableCell[1] > this.BOTTOM) {
+        newViewableCell[1] = this.BOTTOM;
+      }
+
+      this.log('newViewableCell = ' + newViewableCell);
+      return newViewableCell;
     },
 
-    keepWithinGridBoundaries: function(windowPosition) {
+    /*keepWithinGridBoundaries: function(windowPosition) {
       let x = windowPosition[0];
       let y = windowPosition[1];
       if (x > this.GRID_SIZE * this.getCellWidth()) {
@@ -153,16 +176,49 @@ const gridMaker = () => {
         y = 0;
       }
       return [x,y];
+    },*/
+
+    /*realignCellToWindow: function() {
+      let cellWidth = this.getCellWidth();
+      let cellHeight = this.getCellHeight();
+      closestColumn = Math.round(window.pageXOffset / cellWidth);
+      closestRow = Math.round(window.pageYOffset / cellHeight);
+      let newWindowPositionX = cellWidth * closestColumn;
+      let newWindowPositionY = cellHeight * closestRow;
+      this.moveWindowToPosition([newWindowPositionX, newWindowPositionY]);
+      this.gridState.windowPosition = [newWindowPositionX, newWindowPositionY];
+    },*/
+
+    moveWindowToPosition: function(position) {
+      TweenLite.to(window, 1.5, {scrollTo:{y:position[1], x:position[0], autoKill:false}, ease:Power4.easeOut});
+    },
+
+    moveWindowToCell: function(viewableCell) {
+      if (this.gridState.isScrolling === false) {
+        let cellId = '#cell' + viewableCell[0] + '-row' + viewableCell[1];
+        this.gridState.isScrolling = true;
+        TweenLite.to(window, 1.5, {
+          scrollTo:{y:cellId, x:cellId, autoKill:false},
+          ease:Bounce.easeOut,
+          onComplete: () => {
+            this.gridState.isScrolling = false;
+          }
+        });
+      }
     },
 
     getCellWidth: function() {
-      if (this.gridState.cellWidth === null) {
-        this.gridState.cellWidth = document.getElementsByClassName('cell-1x1')[0].clientWidth;
-      }
+      //if (this.gridState.cellWidth === null) {
+      this.gridState.cellWidth = window.innerWidth;
+      //this.gridState.cellWidth = document.getElementsByClassName('cell-1x1')[0].clientWidth;
+      //}
       return this.gridState.cellWidth;
     },
 
     getCellHeight: function() {
+      this.gridState.cellHeight = window.innerHeight;
+      //document.getElementsByClassName('cell-1x1')[0].style.height = this.gridState.cellHeight
+      /*
       let initialHeight = document.getElementsByClassName('cell-1x1')[0].clientHeight;
       if (window.innerHeight < initialHeight) {
         this.gridState.cellHeight = window.innerHeight;
@@ -174,7 +230,16 @@ const gridMaker = () => {
       // document.getElementsByClassName('cell-1x1')[0].clientHeight;
       // document.getElementsByClassName('cell-1x1')[0].offsetHeight; // this seems to be bigger; the whole viewable window including scroll bars
       // document.getElementsByClassName('cell-1x1')[0].scrollHeight;
+      */
       return this.gridState.cellHeight;
+    },
+
+    getMinimumDimension: function() {
+      if (this.getCellWidth() > this.getCellHeight()) {
+        return this.gridState.cellHeight;
+      } else {
+        return this.gridState.cellWidth;
+      }
     },
 
     addVectors: function(vect1, vect2) {
@@ -226,9 +291,11 @@ const gridMaker = () => {
       loggingOn: true,
       cellWidth: null,
       cellHeight: null,
+      viewableCell: [],
       windowPosition: [],
       touchStartPosition: [],
       orientation: null,
+      isScrolling: false,
     },
 
     /*** some constants, for easy reading ***/

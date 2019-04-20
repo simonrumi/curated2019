@@ -12,21 +12,22 @@ p {
   overflow: hidden;
 }
 
-.nav {
+.nav-top, .nav-bottom {
   max-height: 4vh;
 }
 
 .nav-top {
-  padding: 1vh 1vw  0 1vw;
+  margin: 1vh 1vw  0 1vw;
 }
 
 .nav-bottom {
-  padding: 0 1vw  1vh 1vw;
+  margin: 0 1vw  1vh 1vw;
 }
 
-.nav img {
+.nav-top img, .nav-bottom img {
+  height: 100%;
   max-height: 4vh;
-  margin 0;
+  margin: 0;
 }
 
 .page-middle {
@@ -34,20 +35,20 @@ p {
   width: 100%;
 }
 
-.left-nav {
-  padding: 0 0 0 1vw;
+.nav-left {
+  margin: 0 0 0 1vw;
 }
 
-.right-nav {
-  padding: 0 1vw 0 0;
+.nav-right {
+  margin: 0 1vw 0 0;
 }
 
-.left-nav, .right-nav {
+.nav-left, .nav-right {
   position: relative;
   width: 5vw;
 }
 
-.left-nav img, .right-nav img {
+.nav-left img, .nav-right img {
   max-width: 5vw;
   max-height: 18vh;
   margin: 0;

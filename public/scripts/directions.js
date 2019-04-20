@@ -3,7 +3,7 @@ const directions = {
     'vector': [-1,0],
     'range': [-7/8 * Math.PI, 7/8 * Math.PI],
     'img': '<img src="/img/arrowW.png" class="align-left"/>',
-    'classes': ['left-nav', 'align-left'],
+    'classes': ['nav-left', 'align-left'],
     'gridPosition': [0, 1],
   },
   'northwest': {
@@ -31,7 +31,7 @@ const directions = {
     'vector': [1,0],
     'range': [-1/8 * Math.PI, 1/8 * Math.PI],
     'img': '<img src="/img/arrowE.png"/>',
-    'classes': ['align-right', 'right-nav'],
+    'classes': ['align-right', 'nav-right'],
     'gridPosition': [2, 1],
   },
   'southeast': {
