@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", (evt) => {
   }, {passive: false});
 
   window.addEventListener("resize", (evt) => {
-    grid.handleWindowRezise();
+    grid.handleWindowResize();
     buildIt.correctSideNavHeights();
   }, {passive: true}); // setting passive to true means we do not want to interrupt the scrolling while we run this callback.
 

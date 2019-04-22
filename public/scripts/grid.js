@@ -1,6 +1,3 @@
- // TODO: on rotate, realign to current cell (so first need to store current cell)
- // TODO: adjust buttons so they point to adjacent cells
-
 const gridMaker = () => {
   return {
     makeGrid: function() {
@@ -35,10 +32,12 @@ const gridMaker = () => {
       this.moveWindowToCell(centerCell);
     },
 
-    handleNav: function(navData) {
-      let leftPosition = navData[0] * this.getCellWidth();
-      let topPosition = navData[1] * this.getCellHeight();
-      this.moveWindowToPosition([leftPosition, topPosition]);
+    handleNav: function(cellLocation, direction) {
+      if (!cellLocation || cellLocation.length != 2 || !direction || direction.length != 2) {
+          throw new Error('handleNav requires cellLocation & direction arrays in the format [cell,row]');
+        }
+      let newCell = this.addVectors(cellLocation, direction);
+      this.moveWindowToCell(newCell);
     },
 
     handleTouchStart: function(evt) {
@@ -60,13 +59,9 @@ const gridMaker = () => {
         let newTouchPosition = [evt.touches[0].clientX, evt.touches[0].clientY]
         let distanceMoved = this.getDistanceMoved(newTouchPosition);
         let thresholdDistance = this.THRESHOLD * this.getMinimumDimension();
-        this.log('distanceMoved = ' + distanceMoved + ', thresholdDistance = ' + thresholdDistance)
         if (Math.abs(distanceMoved) > thresholdDistance) {
           evt.preventDefault();
           let travelDirection = this.getTravelDirection(newTouchPosition);
-          //let newWindowPosition = this.getNewWindowPositionFromTravelDirection(travelDirection);
-          //let correctedWindowPosition = this.keepWithinGridBoundaries(newWindowPosition);
-          //this.moveWindowToPosition(correctedWindowPosition);
           this.gridState.viewableCell = this.getNewViewableCellFromTravelDirection(travelDirection);
           this.moveWindowToCell(this.gridState.viewableCell);
         } else {
@@ -78,11 +73,15 @@ const gridMaker = () => {
       }
     },
 
-    handleWindowRezise: function(evt) {
+    handleWindowResize: function(evt) {
       this.updateRootDivOrientation();
       this.gridState.cellWidth = window.innerWidth;
       this.gridState.cellHeight = window.innerHeight;
-      this.handleNav(this.gridState.viewableCell);
+      if (!this.gridState.viewableCell || this.gridState.viewableCell[0]  == undefined || this.gridState.viewableCell[1] == undefined) {
+        // if we don't know which cell to put in the view, use the MIDDLE cell
+        this.gridState.viewableCell = [this.MIDDLE, this.MIDDLE];
+      }
+      this.moveWindowToCell(this.gridState.viewableCell);
     },
 
     updateRootDivOrientation: function() {
@@ -158,42 +157,21 @@ const gridMaker = () => {
         newViewableCell[1] = this.BOTTOM;
       }
 
-      this.log('newViewableCell = ' + newViewableCell);
       return newViewableCell;
     },
-
-    /*keepWithinGridBoundaries: function(windowPosition) {
-      let x = windowPosition[0];
-      let y = windowPosition[1];
-      if (x > this.GRID_SIZE * this.getCellWidth()) {
-        x = this.GRID_SIZE * this.getCellWidth();
-      } else if (x < 0) {
-        x = 0;
-      }
-      if (y > this.GRID_SIZE * this.getCellHeight()) {
-        y = this.GRID_SIZE * this.getCellHeight();
-      } else if (y < 0) {
-        y = 0;
-      }
-      return [x,y];
-    },*/
-
-    /*realignCellToWindow: function() {
-      let cellWidth = this.getCellWidth();
-      let cellHeight = this.getCellHeight();
-      closestColumn = Math.round(window.pageXOffset / cellWidth);
-      closestRow = Math.round(window.pageYOffset / cellHeight);
-      let newWindowPositionX = cellWidth * closestColumn;
-      let newWindowPositionY = cellHeight * closestRow;
-      this.moveWindowToPosition([newWindowPositionX, newWindowPositionY]);
-      this.gridState.windowPosition = [newWindowPositionX, newWindowPositionY];
-    },*/
 
     moveWindowToPosition: function(position) {
       TweenLite.to(window, 1.5, {scrollTo:{y:position[1], x:position[0], autoKill:false}, ease:Power4.easeOut});
     },
 
     moveWindowToCell: function(viewableCell) {
+      if (!viewableCell || viewableCell[0] == undefined || viewableCell[1] == undefined) {
+        if (!this.gridState.viewableCell || this.gridState.viewableCell[0] == undefined || this.gridState.viewableCell[1]  == undefined) {
+          this.log('ERROR: moveWindowToCell() could not find a valid cell to move to');
+          return;
+        }
+        viewableCell = this.gridState.viewableCell;
+      }
       if (this.gridState.isScrolling === false) {
         let cellId = '#cell' + viewableCell[0] + '-row' + viewableCell[1];
         this.gridState.isScrolling = true;
@@ -202,6 +180,7 @@ const gridMaker = () => {
           ease:Bounce.easeOut,
           onComplete: () => {
             this.gridState.isScrolling = false;
+            this.gridState.viewableCell = viewableCell;
           }
         });
       }
@@ -283,9 +262,17 @@ const gridMaker = () => {
       } else {
         this.gridState.orientation = 'landscape';
       }
-      this.log('orientation is now ' + this.gridState.orientation);
       return this.gridState.orientation;
     },
+
+    /*** some constants, for easy reading ***/
+    GRID_SIZE: 3,
+    TOP: 0,
+    MIDDLE: 1,
+    BOTTOM: 2,
+    LEFT: 0,
+    RIGHT: 2,
+    THRESHOLD: 0.18,
 
     gridState: {
       loggingOn: true,
@@ -297,15 +284,6 @@ const gridMaker = () => {
       orientation: null,
       isScrolling: false,
     },
-
-    /*** some constants, for easy reading ***/
-    GRID_SIZE: 3,
-    TOP: 0,
-    MIDDLE: 1,
-    BOTTOM: 2,
-    LEFT: 0,
-    RIGHT: 2,
-    THRESHOLD: 0.18,
 
     /* handleTouchCancel: function(evt) {
         log('touch cancel');

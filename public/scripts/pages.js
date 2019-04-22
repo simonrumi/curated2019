@@ -1,12 +1,49 @@
 const pageBuilder = (grid) => {
-    function makeNavBtn(direction) {
+    function makeNavBtn(direction, cellId) {
+      if (!direction || !cellId) {
+        throw new Error('pageBuilder.makeNavBtn got direction ' + direction + ', & cellId ' + cellId);
+        return;
+      }
+      let location = getCellLocationFromCellId(cellId);
+      let buttonValid = validiateButtonDirection(location, direction);
       let btn = document.createElement('div');
-      btn.innerHTML = directions[direction]['img'];
+      if (buttonValid) {
+        btn.innerHTML = directions[direction]['img'];
+        btn.addEventListener('click', grid.handleNav.bind(grid, location, directions[direction]['vector']));
+      }
       directions[direction]['classes'].forEach((btnClass) => {
         btn.classList.add(btnClass);
       });
-      btn.addEventListener('click', grid.handleNav.bind(grid, directions[direction]['gridPosition']));
       return btn;
+    }
+
+    // the cellId is something like "cell0-row1"
+    // this will return something like [0,1]
+    function getCellLocationFromCellId(cellId) {
+      if (!cellId) {
+        throw new Error('pageBuilder.getCellLocationFromCellId got cellId ' + cellId);
+        return;
+      }
+      let regex = /cell(\d)-row(\d)/ig;
+      let cellRegexArr = regex.exec(cellId);
+      if (cellRegexArr.length >= 3) {
+          return [parseInt(cellRegexArr[1]), parseInt(cellRegexArr[2])];
+      } else {
+        throw new Error('pageBuilder.getCellLocationFromCellId could not find the cell and row from the string ' + cellId);
+        return;
+      }
+    }
+
+    function validiateButtonDirection(location, direction) {
+      let buttonValid = true;
+      for (i=0; i<location.length; i++) {
+        if (location[i] <= 0 && directions[direction]['vector'][i] < 0) {
+          buttonValid = false;
+        } else if (location[i] >= (grid.GRID_SIZE - 1) && directions[direction]['vector'][i] > 0) {
+          buttonValid = false;
+        }
+      }
+      return buttonValid;
     }
 
     return {
@@ -19,13 +56,13 @@ const pageBuilder = (grid) => {
         let topNav = document.createElement('div');
         topNav.classList.add('nav-top');
 
-        let northWestBtn = makeNavBtn('northwest');
+        let northWestBtn = makeNavBtn('northwest', cellId);
         topNav.appendChild(northWestBtn);
 
-        let northEastBtn = makeNavBtn('northeast');
+        let northEastBtn = makeNavBtn('northeast', cellId);
         topNav.appendChild(northEastBtn);
 
-        let northBtn = makeNavBtn('north');
+        let northBtn = makeNavBtn('north', cellId);
         topNav.appendChild(northBtn);
 
         pageContainer.appendChild(topNav);
@@ -33,12 +70,10 @@ const pageBuilder = (grid) => {
         let pageMiddle = document.createElement('div');
         pageMiddle.classList.add('page-middle');
 
-        let leftNav = makeNavBtn('west');
+        let leftNav = makeNavBtn('west', cellId);
         pageMiddle.appendChild(leftNav);
 
-        let rightNav = makeNavBtn('east');
-        rightNav.classList.add('right-nav', 'align-right');
-        rightNav.innerHTML = directions.east.img;
+        let rightNav = makeNavBtn('east', cellId);
         pageMiddle.appendChild(rightNav);
 
         let pageContent = document.createElement('div');
@@ -50,13 +85,13 @@ const pageBuilder = (grid) => {
         let bottomNav = document.createElement('div');
         bottomNav.classList.add('clear', 'nav-bottom');
 
-        let southWestBtn = makeNavBtn('southwest');
+        let southWestBtn = makeNavBtn('southwest', cellId);
         bottomNav.appendChild(southWestBtn);
 
-        let southEastBtn = makeNavBtn('southeast');
+        let southEastBtn = makeNavBtn('southeast', cellId);
         bottomNav.appendChild(southEastBtn);
 
-        let southBtn = makeNavBtn('south');
+        let southBtn = makeNavBtn('south', cellId);
         bottomNav.appendChild(southBtn);
 
         pageContainer.appendChild(bottomNav);
@@ -67,8 +102,7 @@ const pageBuilder = (grid) => {
       correctSideNavHeights: function() {
         let navTopHeight = this.getElementHeight('#cell1-row1 .nav-top');
         let navBottomHeight = this.getElementHeight('#cell1-row1 .nav-bottom');
-        let sideNavHeight = window.innerHeight - navTopHeight - navBottomHeight; // - (2 * navDivMarginPx);
-        console.log('got window.innerHeight = ' + window.innerHeight + ', navBottomHeight = ' + navBottomHeight + ', navTopHeight = ' + navTopHeight + ', sideNavHeight = ' + sideNavHeight);
+        let sideNavHeight = window.innerHeight - navTopHeight - navBottomHeight;
         this.setHeightForElements(sideNavHeight, document.getElementsByClassName('nav-left'));
         this.setHeightForElements(sideNavHeight, document.getElementsByClassName('nav-right'));
       },
