@@ -11,8 +11,15 @@ document.addEventListener("DOMContentLoaded", (evt) => {
   });
 
   let homePageCell = document.getElementById('cell1-row1');
-  let homePageContentDiv = homePageCell.getElementsByClassName('page-content')[0];
-  buildIt.homePage(homePageContentDiv);
+  let homePageContainer = homePageCell.getElementsByClassName('page-content')[0];
+  let homePageContent = document.getElementById('page-content-1-1').children[0];
+  homePageContainer.appendChild(homePageContent);
+
+  let videosPageCell = document.getElementById('cell1-row0');
+  let videosPageContainer = videosPageCell.getElementsByClassName('page-content')[0];
+  let videosPageContent = document.getElementById('page-content-1-0').children[0];
+  videosPageContainer.appendChild(videosPageContent);
+
   buildIt.correctSideNavHeights();
 
   window.addEventListener("touchstart", (evt) => {

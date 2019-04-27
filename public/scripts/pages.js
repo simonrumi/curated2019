@@ -122,7 +122,7 @@ const pageBuilder = (grid) => {
         }
       },
 
-      homePage: function(pageContentDiv) {
+      /*homePage: function(pageContentDiv) {
         let whatWeDo = document.createElement('div');
         whatWeDo.classList.add('text-block-med');
         whatWeDo.innerHTML =
@@ -135,6 +135,6 @@ const pageBuilder = (grid) => {
         logo.classList.add('curated-logo');
         logo.innerHTML = '<img src="/img/curated-logo-min.png"/>';
         pageContentDiv.appendChild(logo);
-      },
+      }, */
     }
 }
